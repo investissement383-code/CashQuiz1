@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CashQuiz - Gagnez 250 FCFA par tâche</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-16">
+
+  <!-- Barre de notification en direct des retraits -->
+  <div id="liveTicker" class="bg-emerald-800 text-emerald-100 text-xs py-2 px-4 text-center font-medium shadow-inner flex justify-center items-center space-x-2">
+    <span>🔥 En direct :</span>
+    <span id="tickerText" class="font-bold text-white">Kouassi M. (Côte d'Ivoire) vient de retirer 15 000 FCFA via MTN MoMo</span>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="bg-emerald-700 text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-10">
+    <h1 class="text-xl font-bold tracking-wide">CashQuiz <span class="text-emerald-200 text-sm font-normal">Pro</span></h1>
+    <div class="flex items-center space-x-2">
+      <button id="adminNavBtn" onclick="toggleAdminView()" class="text-xs bg-emerald-800 hover:bg-emerald-900 px-3 py-1.5 rounded font-medium">Panel Admin</button>
+      <button id="logoutBtn" onclick="logout()" class="hidden text-sm bg-emerald-800 hover:bg-emerald-900 px-3 py-1 rounded">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="max-w-md mx-auto p-4 mt-2 space-y-4">
+
+    <!-- 1. ÉCRAN D'INSCRIPTION -->
+    <section id="authSection" class="bg-white p-6 rounded-xl shadow-md">
+      <h2 class="text-2xl font-bold text-center text-emerald-700 mb-2">Bienvenue sur CashQuiz</h2>
+      <p class="text-sm text-center text-slate-500 mb-6">Répondez aux 20 quiz quotidiens à <strong>250 FCFA</strong> chacun et gagnez de l'argent avec vos filleuls !</p>
+      
+      <form id="registerForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Nom complet</label>
+          <input type="text" id="fullName" required placeholder="Ex: Jean Kouassi" class="w-full border rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Adresse Email</label>
+          <input type="email" id="emailInput" required placeholder="Ex: jean@gmail.com" class="w-full border rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Pays (Afrique de l'Ouest & Centrale)</label>
+          <select id="countrySelect" required class="w-full border rounded-lg p-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <optgroup label="Afrique de l'Ouest">
+              <option value="Bénin (+229)">🇧🇯 Bénin (+229)</option>
+              <option value="Burkina Faso (+226)">🇧🇫 Burkina Faso (+226)</option>
+              <option value="Cap-Vert (+238)">🇨🇻 Cap-Vert (+238)</option>
+              <option value="Côte d'Ivoire (+225)">🇨🇮 Côte d'Ivoire (+225)</option>
+              <option value="Gambie (+220)">🇬🇲 Gambie (+220)</option>
+              <option value="Ghana (+233)">🇬🇭 Ghana (+233)</option>
+              <option value="Guinée (+224)">🇬🇳 Guinée (+224)</option>
+              <option value="Guinée-Bissau (+245)">🇬🇼 Guinée-Bissau (+245)</option>
+              <option value="Libéria (+231)">🇱🇷 Libéria (+231)</option>
+              <option value="Mali (+223)">🇲🇱 Mali (+223)</option>
+              <option value="Mauritanie (+222)">🇲🇷 Mauritanie (+222)</option>
+              <option value="Niger (+227)">🇳🇪 Niger (+227)</option>
+              <option value="Nigéria (+234)">🇳🇬 Nigéria (+234)</option>
+              <option value="Sénégal (+221)">🇸🇳 Sénégal (+221)</option>
+              <option value="Sierra Leone (+232)">🇸🇱 Sierra Leone (+232)</option>
+              <option value="Togo (+228)">🇹🇬 Togo (+228)</option>
+            </optgroup>
+            <optgroup label="Afrique Centrale">
+              <option value="Angola (+244)">🇦🇴 Angola (+244)</option>
+              <option value="Cameroun (+237)">🇨🇲 Cameroun (+237)</option>
+              <option value="Centrafrique (+236)">🇨🇫 Centrafrique (+236)</option>
+              <option value="Congo-Brazzaville (+242)">🇨🇬 Congo-Brazzaville (+242)</option>
+              <option value="Congo-Kinshasa / RDC (+243)">🇨🇩 Congo-Kinshasa / RDC (+243)</option>
+              <option value="Gabon (+241)">🇬🇦 Gabon (+241)</option>
+              <option value="Guinée Équatoriale (+240)">🇬🇶 Guinée Équatoriale (+240)</option>
+              <option value="Sao Tomé-et-Principe (+239)">🇸🇹 Sao Tomé-et-Principe (+239)</option>
+              <option value="Tchad (+235)">🇹🇩 Tchad (+235)</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Numéro Mobile Money (Retraits)</label>
+          <input type="tel" id="phoneNumber" required placeholder="Ex: 0197000000" class="w-full border rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition">Créer mon compte CashQuiz</button>
+      </form>
+    </section>
+
+    <!-- 2. ÉCRAN DE PAIEMENT OBLIGATOIRE -->
+    <section id="paywallSection" class="hidden bg-white p-6 rounded-xl shadow-md text-center">
+      <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">🔒</div>
+      <h2 class="text-xl font-bold mb-2">Activation CashQuiz requise</h2>
+      <p class="text-sm text-slate-600 mb-4">Réglez les frais d'activation uniques de <strong>4 500 FCFA</strong> pour débloquer vos 20 quiz quotidiens et vos liens de parrainage.</p>
+      
+      <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+        <span class="text-xs uppercase text-slate-400 font-semibold">Frais d'adhésion unique</span>
+        <div class="text-3xl font-extrabold text-emerald-700 mt-1">4 500 FCFA</div>
+      </div>
+
+      <button onclick="alert('Effectuez le dépôt de 4 500 FCFA sur le numéro du support. L\'administrateur validera votre compte rapidement.')" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-lg shadow transition">
+        Instructions de Paiement MoMo
+      </button>
+    </section>
+
+    <!-- 3. TABLEAU DE BORD & TÂCHES -->
+    <section id="dashboardSection" class="hidden space-y-4">
+      
+      <!-- Carte Solde & Badge VIP -->
+      <div class="bg-gradient-to-r from-emerald-700 to-emerald-600 text-white p-6 rounded-xl shadow-md">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-emerald-100 text-sm">Bonjour, <span id="userNameDisplay" class="font-semibold"></span></p>
+            <h2 class="text-3xl font-extrabold mt-1"><span id="balanceDisplay">0</span> FCFA</h2>
+          </div>
+          <span id="userBadge" class="bg-amber-400 text-slate-900 text-xs font-bold px-3 py-1 rounded-full shadow">⭐ VIP Débutant</span>
+        </div>
+
+        <!-- Bonus de connexion quotidienne -->
+        <div id="streakBox" class="mt-3 bg-emerald-800/60 p-2.5 rounded-lg text-xs flex justify-between items-center hidden">
+          <span>🎁 Bonus quotidien disponible !</span>
+          <button onclick="claimDailyStreak()" class="bg-amber-400 text-slate-900 font-bold px-3 py-1 rounded shadow hover:bg-amber-300">Récupérer +100F</button>
+        </div>
+
+        <!-- Progression quotidienne -->
+        <div class="mt-4">
+          <div class="flex justify-between text-xs text-emerald-100 mb-1">
+            <span>Quiz du jour : <strong id="tasksDoneCount">0</strong> / 20</span>
+            <span>Gains : <strong id="todayEarnings">0</strong> / 5 000 F</span>
+          </div>
+          <div class="w-full bg-emerald-900/50 rounded-full h-2">
+            <div id="progressBar" class="bg-amber-400 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+        
+        <div class="mt-4 pt-4 border-t border-emerald-500/40 flex justify-between items-center text-sm">
+          <span class="text-xs text-emerald-100">250 FCFA / quiz</span>
+          <button onclick="openWithdrawModal()" class="bg-white text-emerald-700 font-bold px-4 py-1.5 rounded-lg text-xs hover:bg-emerald-50 transition shadow-sm">
+            Retirer (MoMo)
+          </button>
+        </div>
+      </div>
+
+      <!-- SECTION PARRAINAGE (VIRALITÉ) -->
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+        <h3 class="font-bold text-sm text-slate-700 mb-2">🤝 Gagnez 500 FCFA par Filleul</h3>
+        <p class="text-xs text-slate-500 mb-3">Partagez votre lien d'invitation sur WhatsApp et gagnez des bonus dès l'activation de vos amis !</p>
+        <div class="flex gap-2">
+          <input type="text" id="referralLinkInput" readonly class="w-full bg-slate-50 border rounded-lg p-2 text-xs text-slate-600 focus:outline-none">
+          <button onclick="copyReferralLink()" class="bg-emerald-600 text-white font-bold px-3 py-2 rounded-lg text-xs hover:bg-emerald-700">Copier</button>
+        </div>
+        <div class="text-[11px] text-slate-400 mt-2">Filleuls parrainés : <strong id="referralCount">0</strong></div>
+      </div>
+
+      <!-- CLASSEMENT DES GAGNEURS (LEADERBOARD) -->
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+        <h3 class="font-bold text-sm text-slate-700 mb-3">🏆 Top Gagneurs de la Semaine</h3>
+        <div id="leaderboardList" class="space-y-2 text-xs">
+          <!-- Rempli dynamiquement -->
+        </div>
+      </div>
+
+      <!-- Liste des 20 Quiz -->
+      <div>
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="font-bold text-lg text-slate-700">Les 20 quiz du jour</h3>
+          <span class="text-xs bg-slate-200 text-slate-600 px-2 py-1 rounded">250 F / quiz</span>
+        </div>
+        <div id="tasksContainer" class="space-y-4"></div>
+      </div>
+
+    </section>
+
+    <!-- 4. PAGE D'ADMINISTRATION -->
+    <section id="adminSection" class="hidden space-y-4">
+      <div class="bg-white p-4 rounded-xl shadow-md border border-slate-200">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-bold text-slate-800">Admin CashQuiz</h2>
+          <span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-semibold">Validation des Inscriptions</span>
+        </div>
+        <p class="text-xs text-slate-500 mb-4">Consultez les détails des inscrits et validez leur paiement pour activer leurs comptes.</p>
+        
+        <div id="adminUsersList" class="space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- SECTION TÉMOIGNAGES DE RETRAITS -->
+    <div id="testimonialsSection" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+      <h3 class="font-bold text-sm text-slate-700 mb-3 flex items-center justify-between">
+        <span>💬 Derniers retraits CashQuiz</span>
+        <span class="text-xs text-emerald-600 font-normal">100% Sécurisé</span>
+      </h3>
+      <div id="testimonialsList" class="space-y-3 text-xs"></div>
+    </div>
+
+    <!-- MODAL DE RETRAIT MOMO -->
+    <div id="withdrawModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-xl max-w-sm w-full p-6">
+        <h3 class="text-lg font-bold mb-2">Retrait Mobile Money</h3>
+        <p class="text-xs text-slate-500 mb-4">Numéro enregistré : <strong id="withdrawPhoneDisplay"></strong></p>
+        
+        <label class="block text-sm font-medium mb-1">Montant à retirer (Min. 2 500 FCFA)</label>
+        <input type="number" id="withdrawAmount" min="2500" step="250" placeholder="Ex: 5000" class="w-full border rounded-lg p-2.5 mb-4">
+        
+        <div class="flex gap-2">
+          <button onclick="closeWithdrawModal()" class="w-1/2 bg-slate-200 text-slate-700 py-2 rounded-lg font-medium">Annuler</button>
+          <button onclick="processWithdraw()" class="w-1/2 bg-emerald-600 text-white py-2 rounded-lg font-bold">Confirmer</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const TASK_REWARD = 250;
+
+    const dailyTasks = [
+      { id: 1, category: "Culture Générale", question: "Quel est le plus grand pays d'Afrique en superficie ?", options: ["RDC", "Algérie", "Soudan", "Libye"], answer: "Algérie" },
+      { id: 2, category: "Actualité & Institutions", question: "Quel organisme régional regroupe les pays ayant en commun l'usage du Franc CFA en Afrique de l'Ouest ?", options: ["CEMAC", "UEMOA", "CEDEAO", "UA"], answer: "UEMOA" },
+      { id: 3, category: "Culture Générale", question: "Sur quel fleuve se trouve le barrage d'Aswan (Assouan) ?", options: ["Le Niger", "Le Congo", "Le Nil", "Le Zambèze"], answer: "Le Nil" },
+      { id: 4, category: "Culture Générale", question: "Quel pays d'Afrique est le plus peuplé ?", options: ["L'Égypte", "L'Éthiopie", "Le Nigéria", "L'Afrique du Sud"], answer: "Le Nigéria" },
+      { id: 5, category: "Culture Générale", question: "En quelle année l'Afrique du Sud a-t-elle officiellement mis fin à l'apartheid avec l'élection de Nelson Mandela ?", options: ["1990", "1994", "1998", "2000"], answer: "1994" },
+      { id: 6, category: "Actualité & Économie", question: "Quelle cryptomonnaie ou actif virtuel a été l'un des premiers à intégrer des contrats intelligents sur une grande échelle ?", options: ["Bitcoin", "Ethereum", "Dogecoin", "Litecoin"], answer: "Ethereum" },
+      { id: 7, category: "Culture Générale", question: "Quelle est la capitale politique du Nigéria ?", options: ["Lagos", "Abuja", "Kano", "Ibadan"], answer: "Abuja" },
+      { id: 8, category: "Culture Générale", question: "Quel désert, l'un des plus grands au monde, couvre une grande partie du nord de l'Afrique ?", options: ["Le Kalahari", "Le Namib", "Le Sahara", "Le Danakil"], answer: "Le Sahara" },
+      { id: 9, category: "Actualité & Technologie", question: "Quel protocole ou application décentralisée est couramment utilisé pour les communications professionnelles et personnelles en Afrique ?", options: ["WhatsApp", "Telegram", "Signal", "Tous les trois"], answer: "Tous les trois" },
+      { id: 10, category: "Culture Générale", question: "Quel empire historique africain était célèbre pour sa richesse en or sous le règne de Kanga Moussa ?", options: ["L'Empire du Ghana", "L'Empire du Mali", "L'Empire songhaï", "Le Royaume du Congo"], answer: "L'Empire du Mali" },
+      { id: 11, category: "Culture Générale", question: "Quel est l'océan qui borde les côtes orientales de l'Afrique ?", options: ["L'Océan Atlantique", "L'Océan Indien", "L'Océan Arctique", "L'Océan Pacifique"], answer: "L'Océan Indien" },
+      { id: 12, category: "Actualité & Institutions", question: "Quel est le siège officiel de l'Union Africaine (UA) ?", options: ["Addis-Abeba (Éthiopie)", "Nairobi (Kenya)", "Abuja (Nigéria)", "Dakar (Sénégal)"], answer: "Addis-Abeba (Éthiopie)" },
+      { id: 13, category: "Culture Générale", question: "Quelle île immense se trouve au large de la côte sud-est de l'Afrique dans l'océan Indien ?", options: ["Maurice", "Les Comores", "Madagascar", "Les Seychelles"], answer: "Madagascar" },
+      { id: 14, category: "Culture Générale", question: "Quel physicien a formulé la célèbre théorie de la relativité (E=mc²) ?", options: ["Isaac Newton", "Albert Einstein", "Galilée", "Nikola Tesla"], answer: "Albert Einstein" },
+      { id: 15, category: "Actualité & Numérique", question: "Quel sigle désigne les services de paiement mobile par téléphone (comme MTN MoMo, Orange Money, etc.) ?", options: ["FinTech", "EdTech", "AgriTech", "DeepTech"], answer: "FinTech" },
+      { id: 16, category: "Culture Générale", question: "Quel est le plus long fleuve du monde ?", options: ["Le fleuve Congo", "Le Nil", "Le Niger", "Le Zambèze"], answer: "Le Nil" },
+      { id: 17, category: "Culture Générale", question: "Quel pays africain a pour capitale Lomé ?", options: ["Le Bénin", "Le Togo", "Le Ghana", "La Côte d'Ivoire"], answer: "Le Togo" },
+      { id: 18, category: "Actualité & Économie", question: "Que signifie le sigle 'ZLECAf' en économie africaine ?", options: ["Zone de Libre-Échange Continentale Africaine", "Zone Légale et Économique Centrale d'Afrique", "Banque Centrale d'Afrique", "Fonds Monétaire Africain"], answer: "Zone de Libre-Échange Continentale Africaine" },
+      { id: 19, category: "Culture Générale", question: "Quel explorateur européen a atteint les Indes en contournant l'Afrique par le Cap de Bonne-Espérance en 1497 ?", options: ["Christophe Colomb", "Vasco de Gama", "Magellan", "Marco Polo"], answer: "Vasco de Gama" },
+      { id: 20, category: "Culture Générale", question: "Combien y a-t-il de pays membres permanents disposant d'un droit de veto au Conseil de sécurité de l'ONU ?", options: ["3", "5", "10", "15"], answer: "5" }
+    ];
+
+    const recentWithdrawals = [
+      { name: "Serge K.", country: "Côte d'Ivoire", amount: "10 000 FCFA", operator: "MTN MoMo", time: "Il y a 2 minutes" },
+      { name: "Aminata D.", country: "Sénégal", amount: "15 000 FCFA", operator: "Wave", time: "Il y a 5 minutes" },
+      { name: "Christian T.", country: "Cameroun", amount: "7 500 FCFA", operator: "Orange Money", time: "Il y a 12 minutes" },
+      { name: "Koffi A.", country: "Togo", amount: "5 000 FCFA", operator: "TMoney", time: "Il y a 18 minutes" }
+    ];
+
+    const leaderboardData = [
+      { rank: 1, name: "Ibrahim M. (Mali)", earnings: "42 500 FCFA" },
+      { rank: 2, name: "Clarisse T. (Cameroun)", earnings: "38 000 FCFA" },
+      { rank: 3, name: "Awa D. (Sénégal)", earnings: "31 250 FCFA" },
+      { rank: 4, name: "Jean-Paul K. (Côte d'Ivoire)", earnings: "27 500 FCFA" }
+    ];
+
+    let allUsers = JSON.parse(localStorage.getItem('cashquiz_all_users')) || [
+      { id: "usr_1", name: "Jean Kouassi", email: "jean@gmail.com", country: "Côte d'Ivoire (+225)", phone: "0197000000", time: "12/11/2026 à 14:30", isPaid: true, balance: 3500, completedTasks: [1, 2, 3], referrals: 2, lastStreakDate: "" },
+      { id: "usr_2", name: "Marcelle N.", email: "marcelle@gmail.com", country: "Cameroun (+237)", phone: "690000000", time: "13/11/2026 à 09:15", isPaid: false, balance: 0, completedTasks: [], referrals: 0, lastStreakDate: "" }
+    ];
+
+    let currentUser = JSON.parse(localStorage.getItem('cashquiz_current_user')) || null;
+    let isAdminView = false;
+
+    function renderTestimonials() {
+      const container = document.getElementById('testimonialsList');
+      container.innerHTML = recentWithdrawals.map(w => `
+        <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+          <div>
+            <strong class="text-slate-800">${w.name}</strong> <span class="text-slate-400">(${w.country})</span>
+            <div class="text-emerald-700 font-bold mt-0.5">Retrait de ${w.amount} (${w.operator})</div>
+          </div>
+          <span class="text-slate-400 text-[10px]">${w.time}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderLeaderboard() {
+      const container = document.getElementById('leaderboardList');
+      container.innerHTML = leaderboardData.map(l => `
+        <div class="flex justify-between items-center bg-slate-50 p-2 rounded-lg border border-slate-100">
+          <div class="flex items-center space-x-2">
+            <span class="font-bold text-emerald-700">#${l.rank}</span>
+            <span class="text-slate-700">${l.name}</span>
+          </div>
+          <span class="font-extrabold text-amber-600">${l.earnings}</span>
+        </div>
+      `).join('');
+    }
+
+    function startLiveTicker() {
+      const ticker = document.getElementById('tickerText');
+      let index = 0;
+      setInterval(() => {
+        index = (index + 1) % recentWithdrawals.length;
+        const w = recentWithdrawals[index];
+        ticker.textContent = `${w.name} (${w.country}) vient de retirer ${w.amount} via ${w.operator}`;
+      }, 4000);
+    }
+
+    function checkDailyReset() {
+      if (!currentUser) return;
+      const today = new Date().toISOString().split('T')[0];
+      if (currentUser.lastTaskDate !== today) {
+        currentUser.lastTaskDate = today;
+        currentUser.completedTasks = [];
+        saveCurrentSession();
+      }
+    }
+
+    function checkStreak() {
+      if (!currentUser) return;
+      const today = new Date().toISOString().split('T')[0];
+      const streakBox = document.getElementById('streakBox');
+      if (currentUser.lastStreakDate !== today) {
+        streakBox.classList.remove('hidden');
+      } else {
+        streakBox.classList.add('hidden');
+      }
+    }
+
+    function claimDailyStreak() {
+      const today = new Date().toISOString().split('T')[0];
+      currentUser.balance += 100;
+      currentUser.lastStreakDate = today;
+      syncUserSave();
+      updateDashboard();
+      alert("Bonus quotidien de 100 FCFA ajouté avec succès !");
+    }
+
+    function renderApp() {
+      checkDailyReset();
+      document.getElementById('authSection').classList.add('hidden');
+      document.getElementById('paywallSection').classList.add('hidden');
+      document.getElementById('dashboardSection').classList.add('hidden');
+      document.getElementById('adminSection').classList.add('hidden');
+      document.getElementById('logoutBtn').classList.add('hidden');
+      document.getElementById('testimonialsSection').classList.remove('hidden');
+
+      if (isAdminView) {
+        document.getElementById('adminSection').classList.remove('hidden');
+        document.getElementById('logoutBtn').classList.remove('hidden');
+        renderAdminPanel();
+        return;
+      }
+
+      if (!currentUser) {
+        document.getElementById('authSection').classList.remove('hidden');
+      } else if (!currentUser.isPaid) {
+        document.getElementById('paywallSection').classList.remove('hidden');
+        document.getElementById('logoutBtn').classList.remove('hidden');
+      } else {
+        document.getElementById('dashboardSection').classList.remove('hidden');
+        document.getElementById('logoutBtn').classList.remove('hidden');
+        document.getElementById('testimonialsSection').classList.add('hidden');
+        updateDashboard();
+        checkStreak();
+      }
+    }
+
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const now = new Date();
+      const timeStr = `${now.toLocaleDateString()} à ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+      
+      const newUser = {
+        id: 'usr_' + Date.now(),
+        name: document.getElementById('fullName').value,
+        email: document.getElementById('emailInput').value,
+        country: document.getElementById('countrySelect').value,
+        phone: document.getElementById('phoneNumber').value,
+        time: timeStr,
+        isPaid: false,
+        balance: 0,
+        lastTaskDate: now.toISOString().split('T')[0],
+        completedTasks: [],
+        referrals: 0,
+        lastStreakDate: ""
+      };
+
+      allUsers.push(newUser);
+      saveAllUsers();
+
+      currentUser = newUser;
+      saveCurrentSession();
+      renderApp();
+    });
+
+    function updateDashboard() {
+      const doneCount = currentUser.completedTasks.length;
+      const earnedToday = doneCount * TASK_REWARD;
+      const progressPercent = (doneCount / dailyTasks.length) * 100;
+
+      document.getElementById('userNameDisplay').textContent = currentUser.name;
+      document.getElementById('balanceDisplay').textContent = currentUser.balance.toLocaleString('fr-FR');
+      document.getElementById('tasksDoneCount').textContent = doneCount;
+      document.getElementById('todayEarnings').textContent = earnedToday.toLocaleString('fr-FR');
+      document.getElementById('progressBar').style.width = `${progressPercent%}`;
+      document.getElementById('referralCount').textContent = currentUser.referrals || 0;
+
+      // Lien de parrainage dynamique
+      const refLink = `${window.location.origin}?ref=${currentUser.id}`;
+      document.getElementById('referralLinkInput').value = refLink;
+
+      // Gestion du Badge VIP selon les tâches faites
+      const badge = document.getElementById('userBadge');
+      if (doneCount >= 20) {
+        badge.textContent = "🔥 VIP Gold";
+      } else if (doneCount >= 10) {
+        badge.textContent = "⭐ VIP Actif";
+      } else {
+        badge.textContent = "🌱 VIP Débutant";
+      }
+
+      const container = document.getElementById('tasksContainer');
+      container.innerHTML = '';
+
+      dailyTasks.forEach(task => {
+        const isDone = currentUser.completedTasks.includes(task.id);
+        const card = document.createElement('div');
+        card.className = `bg-white p-4 rounded-xl shadow-sm border ${isDone ? 'border-emerald-200 opacity-65' : 'border-slate-200'}`;
+        
+        let optionsHtml = task.options.map(opt => `
+          <label class="flex items-center space-x-2 p-2 border rounded-lg cursor-pointer hover:bg-slate-50 text-sm">
+            <input type="radio" name="task_${task.id}" value="${opt}" ${isDone ? 'disabled' : ''}>
+            <span>${opt}</span>
+          </label>
+        `).join('');
+
+        card.innerHTML = `
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">${task.category}</span>
+            <span class="text-xs font-bold text-amber-600">+250 FCFA</span>
+          </div>
+          <p class="font-medium text-sm mb-3">${task.question}</p>
+          <div class="space-y-2 mb-3">${optionsHtml}</div>
+          ${isDone 
+            ? `<button disabled class="w-full bg-slate-200 text-slate-500 text-xs font-bold py-2 rounded-lg">Validée (+250 FCFA)</button>`
+            : `<button onclick="submitTask(${task.id})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-lg transition">Valider (+250 FCFA)</button>`
+          }
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function copyReferralLink() {
+      const input = document.getElementById('referralLinkInput');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      alert("Lien de parrainage copié ! Partagez-le sur WhatsApp pour gagner 500 FCFA par ami.");
+    }
+
+    function submitTask(taskId) {
+      checkDailyReset();
+      if (currentUser.completedTasks.includes(taskId)) return;
+
+      const selected = document.querySelector(`input[name="task_${taskId}"]:checked`);
+      if (!selected) {
+        alert("Veuillez sélectionner une réponse avant de valider.");
+        return;
+      }
+
+      const task = dailyTasks.find(t => t.id === taskId);
+      if (task.answer && selected.value !== task.answer) {
+        alert("Mauvaise réponse ! Réessayez pour gagner les 250 FCFA.");
+        return;
+      }
+
+      currentUser.completedTasks.push(taskId);
+      currentUser.balance += TASK_REWARD;
+      syncUserSave();
+      updateDashboard();
+    }
+
+    function toggleAdminView() {
+      isAdminView = !isAdminView;
+      renderApp();
+    }
+
+    function renderAdminPanel() {
+      const container = document.getElementById('adminUsersList');
+      if (allUsers.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Aucun utilisateur inscrit pour le moment.</p>`;
+        return;
+      }
+
+      container.innerHTML = allUsers.map(u => `
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1.5">
+          <div class="flex justify-between items-start">
+            <strong class="text-slate-800 text-sm">${u.name}</strong>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+              ${u.isPaid ? 'Actif (Payé)' : 'En attente de paiement'}
+            </span>
+          </div>
+          <div class="text-slate-600">📧 Email : <strong>${u.email}</strong></div>
+          <div class="text-slate-600">🌍 Pays : <strong>${u.country}</strong></div>
+          <div class="text-slate-600">📱 Numéro MoMo : <strong>${u.phone}</strong></div>
+          <div class="text-slate-400 text-[10px]">🕒 Inscrit le : ${u.time}</div>
+          
+          <div class="pt-2 flex gap-2">
+            ${!u.isPaid 
+              ? `<button onclick="adminValidateUser('${u.id}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 rounded transition">Valider l'inscription (Payé)</button>`
+              : `<button onclick="adminRevokeUser('${u.id}')" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-1.5 rounded transition">Désactiver</button>`
+            }
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function adminValidateUser(userId) {
+      const user = allUsers.find(u => u.id === userId);
+      if (user) {
+        user.isPaid = true;
+        saveAllUsers();
+        if (currentUser && currentUser.id === userId) {
+          currentUser.isPaid = true;
+          saveCurrentSession();
+        }
+        renderAdminPanel();
+        alert(`Le compte de ${user.name} a été validé avec succès !`);
+      }
+    }
+
+    function adminRevokeUser(userId) {
+      const user = allUsers.find(u => u.id === userId);
+      if (user) {
+        user.isPaid = false;
+        saveAllUsers();
+        if (currentUser && currentUser.id === userId) {
+          currentUser.isPaid = false;
+          saveCurrentSession();
+        }
+        renderAdminPanel();
+      }
+    }
+
+    function openWithdrawModal() {
+      document.getElementById('withdrawPhoneDisplay').textContent = currentUser.phone;
+      document.getElementById('withdrawModal').classList.remove('hidden');
+    }
+
+    function closeWithdrawModal() {
+      document.getElementById('withdrawModal').classList.add('hidden');
+    }
+
+    function processWithdraw() {
+      const amount = parseInt(document.getElementById('withdrawAmount').value);
+      if (isNaN(amount) || amount < 2500) {
+        alert("Le montant minimum de retrait est de 2 500 FCFA.");
+        return;
+      }
+      if (amount > currentUser.balance) {
+        alert("Solde insuffisant.");
+        return;
+      }
+
+      currentUser.balance -= amount;
+      syncUserSave();
+      closeWithdrawModal();
+      updateDashboard();
+      alert(`Demande de transfert de ${amount.toLocaleString('fr-FR')} FCFA envoyée vers le ${currentUser.phone} !`);
+    }
+
+    function syncUserSave() {
+      const index = allUsers.findIndex(u => u.id === currentUser.id);
+      if (index !== -1) allUsers[index] = currentUser;
+      saveCurrentSession();
+      saveAllUsers();
+    }
+
+    function saveCurrentSession() {
+      localStorage.setItem('cashquiz_current_user', JSON.stringify(currentUser));
+    }
+
+    function saveAllUsers() {
+      localStorage.setItem('cashquiz_all_users', JSON.stringify(allUsers));
+    }
+
+    function logout() {
+      localStorage.removeItem('cashquiz_current_user');
+      currentUser = null;
+      isAdminView = false;
+      renderApp();
+    }
+
+    renderTestimonials();
+    renderLeaderboard();
+    startLiveTicker();
+    renderApp();
+  </script>
+</body>
+</html>
