@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CashQuiz - Gagnez 250 FCFA par tâche</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Cache définitivement le badge Netlify en bas de l'écran */
+    #netlify-deploy-badge, iframe[src*="netlify"], div[style*="z-index: 2147483647"] {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+  </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-16">
 
@@ -16,9 +25,11 @@
 
   <!-- Navbar -->
   <nav class="bg-emerald-700 text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-10">
-    <h1 class="text-xl font-bold tracking-wide">CashQuiz <span class="text-emerald-200 text-sm font-normal">Pro</span></h1>
+    <!-- Astuce Admin : Clique 3 fois rapidement sur le titre pour ouvrir l'admin -->
+    <h1 onclick="secretAdminTrigger()" class="text-xl font-bold tracking-wide cursor-pointer select-none">
+      CashQuiz <span class="text-emerald-200 text-sm font-normal">Pro</span>
+    </h1>
     <div class="flex items-center space-x-2">
-      <button id="adminNavBtn" onclick="toggleAdminView()" class="text-xs bg-emerald-800 hover:bg-emerald-900 px-3 py-1.5 rounded font-medium">Panel Admin</button>
       <button id="logoutBtn" onclick="logout()" class="hidden text-sm bg-emerald-800 hover:bg-emerald-900 px-3 py-1 rounded">Déconnexion</button>
     </div>
   </nav>
@@ -96,7 +107,7 @@
 
     </section>
 
-    <!-- 2. TABLEAU DE BORD & TÂCHES (Accessible tout de suite) -->
+    <!-- 2. TABLEAU DE BORD & TÂCHES -->
     <section id="dashboardSection" class="hidden space-y-4">
       
       <!-- Bannière d'alerte si non payé -->
@@ -169,12 +180,12 @@
 
     </section>
 
-    <!-- 3. PAGE D'ADMINISTRATION -->
+    <!-- 3. PAGE D'ADMINISTRATION (Cachée par défaut) -->
     <section id="adminSection" class="hidden space-y-4">
       <div class="bg-white p-4 rounded-xl shadow-md border border-slate-200">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-bold text-slate-800">Admin CashQuiz</h2>
-          <span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-semibold">Validation</span>
+          <button onclick="toggleAdminView()" class="text-xs bg-slate-200 text-slate-700 px-2.5 py-1 rounded">Fermer l'Admin</button>
         </div>
         <p class="text-xs text-slate-500 mb-4">Validez les paiements des utilisateurs inscrits pour activer leurs comptes.</p>
         <div id="adminUsersList" class="space-y-3"></div>
@@ -252,6 +263,18 @@
 
     let currentUser = JSON.parse(localStorage.getItem('cashquiz_current_user')) || null;
     let isAdminView = false;
+    let clickCount = 0;
+
+    // Astuce Secrète : Clique 3 fois rapidement sur le titre "CashQuiz Pro" pour ouvrir l'admin
+    function secretAdminTrigger() {
+      clickCount++;
+      if (clickCount === 3) {
+        clickCount = 0;
+        isAdminView = !isAdminView;
+        renderApp();
+      }
+      setTimeout(() => { clickCount = 0; }, 1000);
+    }
 
     function switchAuthTab(tab) {
       const regForm = document.getElementById('registerForm');
@@ -325,7 +348,6 @@
       if (!currentUser) {
         document.getElementById('authSection').classList.remove('hidden');
       } else {
-        // L'utilisateur connecté voit directement son tableau de bord !
         document.getElementById('dashboardSection').classList.remove('hidden');
         document.getElementById('logoutBtn').classList.remove('hidden');
         document.getElementById('testimonialsSection').classList.add('hidden');
@@ -333,7 +355,6 @@
       }
     }
 
-    // Gestion Inscription
     document.getElementById('registerForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const now = new Date();
@@ -354,7 +375,7 @@
         country: document.getElementById('countrySelect').value,
         phone: document.getElementById('phoneNumber').value,
         time: timeStr,
-        isPaid: false, // Compte non payé par défaut
+        isPaid: false,
         balance: 0,
         completedTasks: [],
         referrals: 0,
@@ -369,7 +390,6 @@
       renderApp();
     });
 
-    // Gestion Connexion
     document.getElementById('loginForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value.trim();
@@ -398,7 +418,6 @@
       document.getElementById('progressBar').style.width = `${progressPercent}%`;
       document.getElementById('referralCount').textContent = currentUser.referrals || 0;
 
-      // Afficher ou masquer la bannière d'activation selon si le compte est payé ou non
       const activationBanner = document.getElementById('activationBanner');
       if (!currentUser.isPaid) {
         activationBanner.classList.remove('hidden');
@@ -448,7 +467,6 @@
     }
 
     function submitTask(taskId) {
-      // Bloquer si le compte n'est pas payé !
       if (!currentUser.isPaid) {
         alert("🔒 Compte non activé !\n\nVeuillez régler les frais d'adhésion de 4 500 FCFA pour pouvoir valider les quiz et encaisser vos gains.");
         return;
@@ -554,6 +572,7 @@
       }
       if (amount > currentUser.balance) {
         alert("Solde insuffisant.");
+        return;
       }
 
       currentUser.balance -= amount;
@@ -561,6 +580,10 @@
       closeWithdrawModal();
       updateDashboard();
       alert(`Retrait de ${amount.toLocaleString('fr-FR')} FCFA demandé avec succès !`);
+    }
+
+    function syncUserShare() {
+      // non utilisé directement, mais conservé pour compatibilité
     }
 
     function syncUserSave() {
