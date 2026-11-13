@@ -6,7 +6,7 @@
   <title>CashQuiz - Gagnez 250 FCFA par tâche</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Cache visuellement le badge Netlify */
+    /* Cache définitivement le badge Netlify en bas de l'écran */
     #netlify-deploy-badge, iframe[src*="netlify"], div[style*="z-index: 2147483647"] {
       display: none !important;
       visibility: hidden !important;
@@ -110,15 +110,26 @@
     <!-- 2. TABLEAU DE BORD & TÂCHES -->
     <section id="dashboardSection" class="hidden space-y-4">
       
+      <!-- CANAL TELEGRAM OFFICIEL -->
+      <div class="bg-gradient-to-r from-sky-600 to-blue-700 text-white p-4 rounded-xl shadow-md flex justify-between items-center">
+        <div>
+          <h3 class="font-bold text-sm flex items-center gap-1.5">📢 Canal Telegram Officiel</h3>
+          <p class="text-xs text-sky-100 mt-0.5">Rejoignez notre communauté pour les preuves de paiement et actualités.</p>
+        </div>
+        <button onclick="window.open('https://t.me/+IOETEIV5ddg0ZTM0', '_blank')" class="bg-white text-blue-700 font-bold px-3.5 py-2 rounded-lg text-xs shadow hover:bg-sky-50 transition whitespace-nowrap">
+          Rejoindre
+        </button>
+      </div>
+
       <!-- Bannière d'alerte si non payé -->
       <div id="activationBanner" class="bg-amber-500 text-white p-4 rounded-xl shadow-md hidden">
         <div class="flex justify-between items-center">
           <div>
             <h3 class="font-bold text-sm">🔒 Compte non activé</h3>
-            <p class="text-xs mt-0.5">Réglez 4 500 FCFA pour pouvoir valider les quiz et effectuer des retraits.</p>
+            <p class="text-xs mt-0.5">Réglez 4 500 FCFA via Sebpay pour valider vos quiz et retraits.</p>
           </div>
-          <button onclick="alert('Effectuez le dépôt de 4 500 FCFA. L\'administrateur validera votre compte.')" class="bg-white text-amber-700 font-bold px-3 py-1.5 rounded-lg text-xs shadow hover:bg-amber-50">
-            Activer
+          <button onclick="window.open('https://new.sebpay.bj/pay/cashquiz-EOCZs2', '_blank')" class="bg-white text-amber-700 font-bold px-3 py-1.5 rounded-lg text-xs shadow hover:bg-amber-50">
+            Payer 4 500 F
           </button>
         </div>
       </div>
@@ -226,7 +237,6 @@
           el.remove();
         }
       });
-      // Supprimer spécifiquement les éléments avec un z-index élevé en bas de page
       document.querySelectorAll('body > div').forEach(div => {
         if (div.style && div.style.zIndex === "2147483647") {
           div.remove();
@@ -237,6 +247,8 @@
 
     const TASK_REWARD = 250;
     const ADMIN_PASSWORD = "admin2026";
+    const SEBPAY_URL = "https://new.sebpay.bj/pay/cashquiz-EOCZs2";
+    const TELEGRAM_CHANNEL = "https://t.me/+IOETEIV5ddg0ZTM0";
 
     const dailyTasks = [
       { id: 1, category: "Culture Générale", question: "Quel est le plus grand pays d'Afrique en superficie ?", options: ["RDC", "Algérie", "Soudan", "Libye"], answer: "Algérie" },
@@ -490,7 +502,9 @@
 
     function submitTask(taskId) {
       if (!currentUser.isPaid) {
-        alert("🔒 Compte non activé !\n\nVeuillez régler les frais d'adhésion de 4 500 FCFA pour pouvoir valider les quiz et encaisser vos gains.");
+        if (confirm("🔒 Compte non activé !\n\nVeuillez régler les frais d'adhésion de 4 500 FCFA via Sebpay pour pouvoir valider les quiz et encaisser vos gains.\n\nVoulez-vous ouvrir la page de paiement Sebpay maintenant ?")) {
+          window.open(SEBPAY_URL, '_blank');
+        }
         return;
       }
 
@@ -575,7 +589,9 @@
 
     function openWithdrawModal() {
       if (!currentUser.isPaid) {
-        alert("🔒 Veuillez activer votre compte pour effectuer des retraits.");
+        if (confirm("🔒 Veuillez activer votre compte via Sebpay pour effectuer des retraits. Ouvrir la page de paiement ?")) {
+          window.open(SEBPAY_URL, '_blank');
+        }
         return;
       }
       document.getElementById('withdrawPhoneDisplay').textContent = currentUser.phone;
