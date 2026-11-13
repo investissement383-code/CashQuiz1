@@ -6,7 +6,7 @@
   <title>CashQuiz - Gagnez 250 FCFA par tâche</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Cache définitivement le badge Netlify en bas de l'écran */
+    /* Cache visuellement le badge Netlify */
     #netlify-deploy-badge, iframe[src*="netlify"], div[style*="z-index: 2147483647"] {
       display: none !important;
       visibility: hidden !important;
@@ -180,7 +180,7 @@
 
     </section>
 
-    <!-- 3. PAGE D'ADMINISTRATION (Sécurisée par mot de passe) -->
+    <!-- 3. PAGE D'ADMINISTRATION -->
     <section id="adminSection" class="hidden space-y-4">
       <div class="bg-white p-4 rounded-xl shadow-md border border-slate-200">
         <div class="flex justify-between items-center mb-4">
@@ -218,8 +218,25 @@
   </main>
 
   <script>
+    // Script de nettoyage automatique anti-badge Netlify
+    function removeNetlifyBadge() {
+      const badges = document.querySelectorAll('iframe, div');
+      badges.forEach(el => {
+        if (el.id === 'netlify-deploy-badge' || (el.shadowRoot && el.shadowRoot.innerHTML.includes('Netlify')) || (el.innerHTML && el.innerHTML.includes('Powered by Netlify')) || (el.outerHTML && el.outerHTML.includes('netlify'))) {
+          el.remove();
+        }
+      });
+      // Supprimer spécifiquement les éléments avec un z-index élevé en bas de page
+      document.querySelectorAll('body > div').forEach(div => {
+        if (div.style && div.style.zIndex === "2147483647") {
+          div.remove();
+        }
+      });
+    }
+    setInterval(removeNetlifyBadge, 500);
+
     const TASK_REWARD = 250;
-    const ADMIN_PASSWORD = "admin2026"; // 🔐 Modifie ce mot de passe si tu veux
+    const ADMIN_PASSWORD = "admin2026";
 
     const dailyTasks = [
       { id: 1, category: "Culture Générale", question: "Quel est le plus grand pays d'Afrique en superficie ?", options: ["RDC", "Algérie", "Soudan", "Libye"], answer: "Algérie" },
@@ -266,7 +283,6 @@
     let isAdminView = false;
     let clickCount = 0;
 
-    // Déclencheur secret par triple clic + Mot de passe
     function secretAdminTrigger() {
       clickCount++;
       if (clickCount === 3) {
