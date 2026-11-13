@@ -25,12 +25,20 @@
 
   <main class="max-w-md mx-auto p-4 mt-2 space-y-4">
 
-    <!-- 1. ÉCRAN D'INSCRIPTION -->
+    <!-- 1. ÉCRAN D'INSCRIPTION / CONNEXION -->
     <section id="authSection" class="bg-white p-6 rounded-xl shadow-md">
-      <h2 class="text-2xl font-bold text-center text-emerald-700 mb-2">Bienvenue sur CashQuiz</h2>
-      <p class="text-sm text-center text-slate-500 mb-6">Répondez aux 20 quiz quotidiens à <strong>250 FCFA</strong> chacun et gagnez de l'argent avec vos filleuls !</p>
       
+      <!-- Onglets bascule Inscription / Connexion -->
+      <div class="flex border-b mb-6 text-sm font-semibold">
+        <button id="tabRegisterBtn" onclick="switchAuthTab('register')" class="w-1/2 pb-2 text-emerald-700 border-b-2 border-emerald-600 text-center">Inscription</button>
+        <button id="tabLoginBtn" onclick="switchAuthTab('login')" class="w-1/2 pb-2 text-slate-400 border-b-2 border-transparent text-center">Se connecter</button>
+      </div>
+
+      <!-- Formulaire d'inscription -->
       <form id="registerForm" class="space-y-4">
+        <h2 class="text-xl font-bold text-emerald-700 mb-1">Créer un compte</h2>
+        <p class="text-xs text-slate-500 mb-4">Accédez à votre tableau de bord et commencez à explorer les quiz !</p>
+        
         <div>
           <label class="block text-sm font-medium mb-1">Nom complet</label>
           <input type="text" id="fullName" required placeholder="Ex: Jean Kouassi" class="w-full border rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
@@ -42,35 +50,24 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-1">Pays (Afrique de l'Ouest & Centrale)</label>
+          <label class="block text-sm font-medium mb-1">Pays</label>
           <select id="countrySelect" required class="w-full border rounded-lg p-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
             <optgroup label="Afrique de l'Ouest">
               <option value="Bénin (+229)">🇧🇯 Bénin (+229)</option>
               <option value="Burkina Faso (+226)">🇧🇫 Burkina Faso (+226)</option>
-              <option value="Cap-Vert (+238)">🇨🇻 Cap-Vert (+238)</option>
               <option value="Côte d'Ivoire (+225)">🇨🇮 Côte d'Ivoire (+225)</option>
-              <option value="Gambie (+220)">🇬🇲 Gambie (+220)</option>
               <option value="Ghana (+233)">🇬🇭 Ghana (+233)</option>
-              <option value="Guinée (+224)">🇬🇳 Guinée (+224)</option>
-              <option value="Guinée-Bissau (+245)">🇬🇼 Guinée-Bissau (+245)</option>
-              <option value="Libéria (+231)">🇱🇷 Libéria (+231)</option>
               <option value="Mali (+223)">🇲🇱 Mali (+223)</option>
-              <option value="Mauritanie (+222)">🇲🇷 Mauritanie (+222)</option>
               <option value="Niger (+227)">🇳🇪 Niger (+227)</option>
               <option value="Nigéria (+234)">🇳🇬 Nigéria (+234)</option>
               <option value="Sénégal (+221)">🇸🇳 Sénégal (+221)</option>
-              <option value="Sierra Leone (+232)">🇸🇱 Sierra Leone (+232)</option>
               <option value="Togo (+228)">🇹🇬 Togo (+228)</option>
             </optgroup>
             <optgroup label="Afrique Centrale">
-              <option value="Angola (+244)">🇦🇴 Angola (+244)</option>
               <option value="Cameroun (+237)">🇨🇲 Cameroun (+237)</option>
-              <option value="Centrafrique (+236)">🇨🇫 Centrafrique (+236)</option>
               <option value="Congo-Brazzaville (+242)">🇨🇬 Congo-Brazzaville (+242)</option>
               <option value="Congo-Kinshasa / RDC (+243)">🇨🇩 Congo-Kinshasa / RDC (+243)</option>
               <option value="Gabon (+241)">🇬🇦 Gabon (+241)</option>
-              <option value="Guinée Équatoriale (+240)">🇬🇶 Guinée Équatoriale (+240)</option>
-              <option value="Sao Tomé-et-Principe (+239)">🇸🇹 Sao Tomé-et-Principe (+239)</option>
               <option value="Tchad (+235)">🇹🇩 Tchad (+235)</option>
             </optgroup>
           </select>
@@ -81,29 +78,40 @@
           <input type="tel" id="phoneNumber" required placeholder="Ex: 0197000000" class="w-full border rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
         </div>
 
-        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition">Créer mon compte CashQuiz</button>
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition">Accéder à mon tableau de bord</button>
       </form>
+
+      <!-- Formulaire de Connexion -->
+      <form id="loginForm" class="space-y-4 hidden">
+        <h2 class="text-xl font-bold text-emerald-700 mb-1">Connexion</h2>
+        <p class="text-xs text-slate-500 mb-4">Entrez votre adresse email pour retrouver votre tableau de bord.</p>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Adresse Email enregistrée</label>
+          <input type="email" id="loginEmail" required placeholder="Ex: jean@gmail.com" class="w-full border rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition">Se connecter</button>
+      </form>
+
     </section>
 
-    <!-- 2. ÉCRAN DE PAIEMENT OBLIGATOIRE -->
-    <section id="paywallSection" class="hidden bg-white p-6 rounded-xl shadow-md text-center">
-      <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">🔒</div>
-      <h2 class="text-xl font-bold mb-2">Activation CashQuiz requise</h2>
-      <p class="text-sm text-slate-600 mb-4">Réglez les frais d'activation uniques de <strong>4 500 FCFA</strong> pour débloquer vos 20 quiz quotidiens et vos liens de parrainage.</p>
-      
-      <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
-        <span class="text-xs uppercase text-slate-400 font-semibold">Frais d'adhésion unique</span>
-        <div class="text-3xl font-extrabold text-emerald-700 mt-1">4 500 FCFA</div>
-      </div>
-
-      <button onclick="alert('Effectuez le dépôt de 4 500 FCFA sur le numéro du support. L\'administrateur validera votre compte rapidement.')" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-lg shadow transition">
-        Instructions de Paiement MoMo
-      </button>
-    </section>
-
-    <!-- 3. TABLEAU DE BORD & TÂCHES -->
+    <!-- 2. TABLEAU DE BORD & TÂCHES (Accessible tout de suite) -->
     <section id="dashboardSection" class="hidden space-y-4">
       
+      <!-- Bannière d'alerte si non payé -->
+      <div id="activationBanner" class="bg-amber-500 text-white p-4 rounded-xl shadow-md hidden">
+        <div class="flex justify-between items-center">
+          <div>
+            <h3 class="font-bold text-sm">🔒 Compte non activé</h3>
+            <p class="text-xs mt-0.5">Réglez 4 500 FCFA pour pouvoir valider les quiz et effectuer des retraits.</p>
+          </div>
+          <button onclick="alert('Effectuez le dépôt de 4 500 FCFA. L\'administrateur validera votre compte.')" class="bg-white text-amber-700 font-bold px-3 py-1.5 rounded-lg text-xs shadow hover:bg-amber-50">
+            Activer
+          </button>
+        </div>
+      </div>
+
       <!-- Carte Solde & Badge VIP -->
       <div class="bg-gradient-to-r from-emerald-700 to-emerald-600 text-white p-6 rounded-xl shadow-md">
         <div class="flex justify-between items-start">
@@ -112,12 +120,6 @@
             <h2 class="text-3xl font-extrabold mt-1"><span id="balanceDisplay">0</span> FCFA</h2>
           </div>
           <span id="userBadge" class="bg-amber-400 text-slate-900 text-xs font-bold px-3 py-1 rounded-full shadow">⭐ VIP Débutant</span>
-        </div>
-
-        <!-- Bonus de connexion quotidienne -->
-        <div id="streakBox" class="mt-3 bg-emerald-800/60 p-2.5 rounded-lg text-xs flex justify-between items-center hidden">
-          <span>🎁 Bonus quotidien disponible !</span>
-          <button onclick="claimDailyStreak()" class="bg-amber-400 text-slate-900 font-bold px-3 py-1 rounded shadow hover:bg-amber-300">Récupérer +100F</button>
         </div>
 
         <!-- Progression quotidienne -->
@@ -139,10 +141,10 @@
         </div>
       </div>
 
-      <!-- SECTION PARRAINAGE (VIRALITÉ) -->
+      <!-- SECTION PARRAINAGE -->
       <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
         <h3 class="font-bold text-sm text-slate-700 mb-2">🤝 Gagnez 500 FCFA par Filleul</h3>
-        <p class="text-xs text-slate-500 mb-3">Partagez votre lien d'invitation sur WhatsApp et gagnez des bonus dès l'activation de vos amis !</p>
+        <p class="text-xs text-slate-500 mb-3">Partagez votre lien d'invitation sur WhatsApp :</p>
         <div class="flex gap-2">
           <input type="text" id="referralLinkInput" readonly class="w-full bg-slate-50 border rounded-lg p-2 text-xs text-slate-600 focus:outline-none">
           <button onclick="copyReferralLink()" class="bg-emerald-600 text-white font-bold px-3 py-2 rounded-lg text-xs hover:bg-emerald-700">Copier</button>
@@ -150,12 +152,10 @@
         <div class="text-[11px] text-slate-400 mt-2">Filleuls parrainés : <strong id="referralCount">0</strong></div>
       </div>
 
-      <!-- CLASSEMENT DES GAGNEURS (LEADERBOARD) -->
+      <!-- CLASSEMENT -->
       <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
         <h3 class="font-bold text-sm text-slate-700 mb-3">🏆 Top Gagneurs de la Semaine</h3>
-        <div id="leaderboardList" class="space-y-2 text-xs">
-          <!-- Rempli dynamiquement -->
-        </div>
+        <div id="leaderboardList" class="space-y-2 text-xs"></div>
       </div>
 
       <!-- Liste des 20 Quiz -->
@@ -169,20 +169,19 @@
 
     </section>
 
-    <!-- 4. PAGE D'ADMINISTRATION -->
+    <!-- 3. PAGE D'ADMINISTRATION -->
     <section id="adminSection" class="hidden space-y-4">
       <div class="bg-white p-4 rounded-xl shadow-md border border-slate-200">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-bold text-slate-800">Admin CashQuiz</h2>
-          <span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-semibold">Validation des Inscriptions</span>
+          <span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-semibold">Validation</span>
         </div>
-        <p class="text-xs text-slate-500 mb-4">Consultez les détails des inscrits et validez leur paiement pour activer leurs comptes.</p>
-        
+        <p class="text-xs text-slate-500 mb-4">Validez les paiements des utilisateurs inscrits pour activer leurs comptes.</p>
         <div id="adminUsersList" class="space-y-3"></div>
       </div>
     </section>
 
-    <!-- SECTION TÉMOIGNAGES DE RETRAITS -->
+    <!-- TÉMOIGNAGES -->
     <div id="testimonialsSection" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
       <h3 class="font-bold text-sm text-slate-700 mb-3 flex items-center justify-between">
         <span>💬 Derniers retraits CashQuiz</span>
@@ -191,15 +190,13 @@
       <div id="testimonialsList" class="space-y-3 text-xs"></div>
     </div>
 
-    <!-- MODAL DE RETRAIT MOMO -->
+    <!-- MODAL DE RETRAIT -->
     <div id="withdrawModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div class="bg-white rounded-xl max-w-sm w-full p-6">
         <h3 class="text-lg font-bold mb-2">Retrait Mobile Money</h3>
         <p class="text-xs text-slate-500 mb-4">Numéro enregistré : <strong id="withdrawPhoneDisplay"></strong></p>
-        
-        <label class="block text-sm font-medium mb-1">Montant à retirer (Min. 2 500 FCFA)</label>
+        <label class="block text-sm font-medium mb-1">Montant (Min. 2 500 FCFA)</label>
         <input type="number" id="withdrawAmount" min="2500" step="250" placeholder="Ex: 5000" class="w-full border rounded-lg p-2.5 mb-4">
-        
         <div class="flex gap-2">
           <button onclick="closeWithdrawModal()" class="w-1/2 bg-slate-200 text-slate-700 py-2 rounded-lg font-medium">Annuler</button>
           <button onclick="processWithdraw()" class="w-1/2 bg-emerald-600 text-white py-2 rounded-lg font-bold">Confirmer</button>
@@ -250,12 +247,30 @@
     ];
 
     let allUsers = JSON.parse(localStorage.getItem('cashquiz_all_users')) || [
-      { id: "usr_1", name: "Jean Kouassi", email: "jean@gmail.com", country: "Côte d'Ivoire (+225)", phone: "0197000000", time: "12/11/2026 à 14:30", isPaid: true, balance: 3500, completedTasks: [1, 2, 3], referrals: 2, lastStreakDate: "" },
-      { id: "usr_2", name: "Marcelle N.", email: "marcelle@gmail.com", country: "Cameroun (+237)", phone: "690000000", time: "13/11/2026 à 09:15", isPaid: false, balance: 0, completedTasks: [], referrals: 0, lastStreakDate: "" }
+      { id: "usr_1", name: "Jean Kouassi", email: "jean@gmail.com", country: "Côte d'Ivoire (+225)", phone: "0197000000", time: "12/11/2026 à 14:30", isPaid: true, balance: 3500, completedTasks: [1, 2, 3], referrals: 2, lastStreakDate: "" }
     ];
 
     let currentUser = JSON.parse(localStorage.getItem('cashquiz_current_user')) || null;
     let isAdminView = false;
+
+    function switchAuthTab(tab) {
+      const regForm = document.getElementById('registerForm');
+      const logForm = document.getElementById('loginForm');
+      const regBtn = document.getElementById('tabRegisterBtn');
+      const logBtn = document.getElementById('tabLoginBtn');
+
+      if (tab === 'register') {
+        regForm.classList.remove('hidden');
+        logForm.classList.add('hidden');
+        regBtn.className = "w-1/2 pb-2 text-emerald-700 border-b-2 border-emerald-600 text-center";
+        logBtn.className = "w-1/2 pb-2 text-slate-400 border-b-2 border-transparent text-center";
+      } else {
+        regForm.classList.add('hidden');
+        logForm.classList.remove('hidden');
+        logBtn.className = "w-1/2 pb-2 text-emerald-700 border-b-2 border-emerald-600 text-center";
+        regBtn.className = "w-1/2 pb-2 text-slate-400 border-b-2 border-transparent text-center";
+      }
+    }
 
     function renderTestimonials() {
       const container = document.getElementById('testimonialsList');
@@ -293,40 +308,8 @@
       }, 4000);
     }
 
-    function checkDailyReset() {
-      if (!currentUser) return;
-      const today = new Date().toISOString().split('T')[0];
-      if (currentUser.lastTaskDate !== today) {
-        currentUser.lastTaskDate = today;
-        currentUser.completedTasks = [];
-        saveCurrentSession();
-      }
-    }
-
-    function checkStreak() {
-      if (!currentUser) return;
-      const today = new Date().toISOString().split('T')[0];
-      const streakBox = document.getElementById('streakBox');
-      if (currentUser.lastStreakDate !== today) {
-        streakBox.classList.remove('hidden');
-      } else {
-        streakBox.classList.add('hidden');
-      }
-    }
-
-    function claimDailyStreak() {
-      const today = new Date().toISOString().split('T')[0];
-      currentUser.balance += 100;
-      currentUser.lastStreakDate = today;
-      syncUserSave();
-      updateDashboard();
-      alert("Bonus quotidien de 100 FCFA ajouté avec succès !");
-    }
-
     function renderApp() {
-      checkDailyReset();
       document.getElementById('authSection').classList.add('hidden');
-      document.getElementById('paywallSection').classList.add('hidden');
       document.getElementById('dashboardSection').classList.add('hidden');
       document.getElementById('adminSection').classList.add('hidden');
       document.getElementById('logoutBtn').classList.add('hidden');
@@ -341,33 +324,38 @@
 
       if (!currentUser) {
         document.getElementById('authSection').classList.remove('hidden');
-      } else if (!currentUser.isPaid) {
-        document.getElementById('paywallSection').classList.remove('hidden');
-        document.getElementById('logoutBtn').classList.remove('hidden');
       } else {
+        // L'utilisateur connecté voit directement son tableau de bord !
         document.getElementById('dashboardSection').classList.remove('hidden');
         document.getElementById('logoutBtn').classList.remove('hidden');
         document.getElementById('testimonialsSection').classList.add('hidden');
         updateDashboard();
-        checkStreak();
       }
     }
 
+    // Gestion Inscription
     document.getElementById('registerForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const now = new Date();
       const timeStr = `${now.toLocaleDateString()} à ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
       
+      const email = document.getElementById('emailInput').value.trim();
+      const existing = allUsers.find(u => u.email === email);
+      if (existing) {
+        alert("Cet email est déjà utilisé. Veuillez vous connecter.");
+        switchAuthTab('login');
+        return;
+      }
+
       const newUser = {
         id: 'usr_' + Date.now(),
         name: document.getElementById('fullName').value,
-        email: document.getElementById('emailInput').value,
+        email: email,
         country: document.getElementById('countrySelect').value,
         phone: document.getElementById('phoneNumber').value,
         time: timeStr,
-        isPaid: false,
+        isPaid: false, // Compte non payé par défaut
         balance: 0,
-        lastTaskDate: now.toISOString().split('T')[0],
         completedTasks: [],
         referrals: 0,
         lastStreakDate: ""
@@ -381,6 +369,23 @@
       renderApp();
     });
 
+    // Gestion Connexion
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const found = allUsers.find(u => u.email === email);
+
+      if (!found) {
+        alert("Aucun compte trouvé avec cet email. Veuillez vous inscrire.");
+        switchAuthTab('register');
+        return;
+      }
+
+      currentUser = found;
+      saveCurrentSession();
+      renderApp();
+    });
+
     function updateDashboard() {
       const doneCount = currentUser.completedTasks.length;
       const earnedToday = doneCount * TASK_REWARD;
@@ -390,22 +395,19 @@
       document.getElementById('balanceDisplay').textContent = currentUser.balance.toLocaleString('fr-FR');
       document.getElementById('tasksDoneCount').textContent = doneCount;
       document.getElementById('todayEarnings').textContent = earnedToday.toLocaleString('fr-FR');
-      document.getElementById('progressBar').style.width = `${progressPercent%}`;
+      document.getElementById('progressBar').style.width = `${progressPercent}%`;
       document.getElementById('referralCount').textContent = currentUser.referrals || 0;
 
-      // Lien de parrainage dynamique
+      // Afficher ou masquer la bannière d'activation selon si le compte est payé ou non
+      const activationBanner = document.getElementById('activationBanner');
+      if (!currentUser.isPaid) {
+        activationBanner.classList.remove('hidden');
+      } else {
+        activationBanner.classList.add('hidden');
+      }
+
       const refLink = `${window.location.origin}?ref=${currentUser.id}`;
       document.getElementById('referralLinkInput').value = refLink;
-
-      // Gestion du Badge VIP selon les tâches faites
-      const badge = document.getElementById('userBadge');
-      if (doneCount >= 20) {
-        badge.textContent = "🔥 VIP Gold";
-      } else if (doneCount >= 10) {
-        badge.textContent = "⭐ VIP Actif";
-      } else {
-        badge.textContent = "🌱 VIP Débutant";
-      }
 
       const container = document.getElementById('tasksContainer');
       container.innerHTML = '';
@@ -442,22 +444,27 @@
       const input = document.getElementById('referralLinkInput');
       input.select();
       navigator.clipboard.writeText(input.value);
-      alert("Lien de parrainage copié ! Partagez-le sur WhatsApp pour gagner 500 FCFA par ami.");
+      alert("Lien de parrainage copié !");
     }
 
     function submitTask(taskId) {
-      checkDailyReset();
+      // Bloquer si le compte n'est pas payé !
+      if (!currentUser.isPaid) {
+        alert("🔒 Compte non activé !\n\nVeuillez régler les frais d'adhésion de 4 500 FCFA pour pouvoir valider les quiz et encaisser vos gains.");
+        return;
+      }
+
       if (currentUser.completedTasks.includes(taskId)) return;
 
       const selected = document.querySelector(`input[name="task_${taskId}"]:checked`);
       if (!selected) {
-        alert("Veuillez sélectionner une réponse avant de valider.");
+        alert("Veuillez sélectionner une réponse.");
         return;
       }
 
       const task = dailyTasks.find(t => t.id === taskId);
       if (task.answer && selected.value !== task.answer) {
-        alert("Mauvaise réponse ! Réessayez pour gagner les 250 FCFA.");
+        alert("Mauvaise réponse ! Réessayez.");
         return;
       }
 
@@ -475,7 +482,7 @@
     function renderAdminPanel() {
       const container = document.getElementById('adminUsersList');
       if (allUsers.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Aucun utilisateur inscrit pour le moment.</p>`;
+        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Aucun utilisateur.</p>`;
         return;
       }
 
@@ -488,14 +495,11 @@
             </span>
           </div>
           <div class="text-slate-600">📧 Email : <strong>${u.email}</strong></div>
-          <div class="text-slate-600">🌍 Pays : <strong>${u.country}</strong></div>
-          <div class="text-slate-600">📱 Numéro MoMo : <strong>${u.phone}</strong></div>
-          <div class="text-slate-400 text-[10px]">🕒 Inscrit le : ${u.time}</div>
-          
+          <div class="text-slate-600">📱 Numéro : <strong>${u.phone}</strong></div>
           <div class="pt-2 flex gap-2">
             ${!u.isPaid 
               ? `<button onclick="adminValidateUser('${u.id}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 rounded transition">Valider l'inscription (Payé)</button>`
-              : `<button onclick="adminRevokeUser('${u.id}')" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-1.5 rounded transition">Désactiver</button>`
+              : `<button onclick="adminRevokeUser('${u.id}')" class="w-full bg-slate-200 text-slate-700 py-1.5 rounded">Désactiver</button>`
             }
           </div>
         </div>
@@ -512,7 +516,7 @@
           saveCurrentSession();
         }
         renderAdminPanel();
-        alert(`Le compte de ${user.name} a été validé avec succès !`);
+        alert(`Compte de ${user.name} activé avec succès !`);
       }
     }
 
@@ -530,6 +534,10 @@
     }
 
     function openWithdrawModal() {
+      if (!currentUser.isPaid) {
+        alert("🔒 Veuillez activer votre compte pour effectuer des retraits.");
+        return;
+      }
       document.getElementById('withdrawPhoneDisplay').textContent = currentUser.phone;
       document.getElementById('withdrawModal').classList.remove('hidden');
     }
@@ -541,19 +549,18 @@
     function processWithdraw() {
       const amount = parseInt(document.getElementById('withdrawAmount').value);
       if (isNaN(amount) || amount < 2500) {
-        alert("Le montant minimum de retrait est de 2 500 FCFA.");
+        alert("Minimum de retrait : 2 500 FCFA.");
         return;
       }
       if (amount > currentUser.balance) {
         alert("Solde insuffisant.");
-        return;
       }
 
       currentUser.balance -= amount;
       syncUserSave();
       closeWithdrawModal();
       updateDashboard();
-      alert(`Demande de transfert de ${amount.toLocaleString('fr-FR')} FCFA envoyée vers le ${currentUser.phone} !`);
+      alert(`Retrait de ${amount.toLocaleString('fr-FR')} FCFA demandé avec succès !`);
     }
 
     function syncUserSave() {
