@@ -25,7 +25,7 @@
 
   <!-- Navbar -->
   <nav class="bg-emerald-700 text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-10">
-    <!-- Astuce Admin : Clique 3 fois rapidement sur le titre pour ouvrir l'admin -->
+    <!-- Zone secrète : Triple clic + Mot de passe requis -->
     <h1 onclick="secretAdminTrigger()" class="text-xl font-bold tracking-wide cursor-pointer select-none">
       CashQuiz <span class="text-emerald-200 text-sm font-normal">Pro</span>
     </h1>
@@ -180,7 +180,7 @@
 
     </section>
 
-    <!-- 3. PAGE D'ADMINISTRATION (Cachée par défaut) -->
+    <!-- 3. PAGE D'ADMINISTRATION (Sécurisée par mot de passe) -->
     <section id="adminSection" class="hidden space-y-4">
       <div class="bg-white p-4 rounded-xl shadow-md border border-slate-200">
         <div class="flex justify-between items-center mb-4">
@@ -219,6 +219,7 @@
 
   <script>
     const TASK_REWARD = 250;
+    const ADMIN_PASSWORD = "admin2026"; // 🔐 Modifie ce mot de passe si tu veux
 
     const dailyTasks = [
       { id: 1, category: "Culture Générale", question: "Quel est le plus grand pays d'Afrique en superficie ?", options: ["RDC", "Algérie", "Soudan", "Libye"], answer: "Algérie" },
@@ -265,13 +266,18 @@
     let isAdminView = false;
     let clickCount = 0;
 
-    // Astuce Secrète : Clique 3 fois rapidement sur le titre "CashQuiz Pro" pour ouvrir l'admin
+    // Déclencheur secret par triple clic + Mot de passe
     function secretAdminTrigger() {
       clickCount++;
       if (clickCount === 3) {
         clickCount = 0;
-        isAdminView = !isAdminView;
-        renderApp();
+        const pwd = prompt("Entrez le mot de passe administrateur :");
+        if (pwd === ADMIN_PASSWORD) {
+          isAdminView = !isAdminView;
+          renderApp();
+        } else if (pwd !== null) {
+          alert("Mot de passe incorrect.");
+        }
       }
       setTimeout(() => { clickCount = 0; }, 1000);
     }
@@ -580,10 +586,6 @@
       closeWithdrawModal();
       updateDashboard();
       alert(`Retrait de ${amount.toLocaleString('fr-FR')} FCFA demandé avec succès !`);
-    }
-
-    function syncUserShare() {
-      // non utilisé directement, mais conservé pour compatibilité
     }
 
     function syncUserSave() {
