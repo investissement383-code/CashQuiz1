@@ -229,6 +229,48 @@
   </main>
 
   <script>
+    // --- SYNTHÈSE AUDIO / SONS DE SUCCÈS ET D'ÉCHEC ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (!audioCtx) return;
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+
+      if (type === 'success') {
+        // Jingle mélodieux de réussite (deux notes montantes)
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(523.25, now); // Do (C5)
+        oscillator.frequency.setValueAtTime(659.25, now + 0.1); // Mi (E5)
+        oscillator.frequency.setValueAtTime(783.99, now + 0.2); // Sol (G5)
+        
+        gainNode.gain.setValueAtTime(0.15, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+        
+        oscillator.start(now);
+        oscillator.stop(now + 0.4);
+      } else if (type === 'error') {
+        // Son grave d'échec / pénalité
+        oscillator.type = 'sawtooth';
+        oscillator.frequency.setValueAtTime(180, now);
+        oscillator.frequency.setValueAtTime(120, now + 0.15);
+        
+        gainNode.gain.setValueAtTime(0.2, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        
+        oscillator.start(now);
+        oscillator.stop(now + 0.35);
+      }
+    }
+
     // Script de nettoyage automatique anti-badge Netlify
     function removeNetlifyBadge() {
       const badges = document.querySelectorAll('iframe, div');
@@ -517,15 +559,23 @@
       }
 
       const task = dailyTasks.find(t => t.id === taskId);
+      
+      // Vérification de la réponse
       if (task.answer && selected.value !== task.answer) {
-        alert("Mauvaise réponse ! Réessayez.");
+        playSound('error'); // 🔊 Joue le son d'échec / pénalité
+        currentUser.balance = Math.max(0, currentUser.balance - TASK_REWARD);
+        syncUserSave();
+        updateDashboard();
+        alert(`❌ Mauvaise réponse !\n\nVous perdez ${TASK_REWARD} FCFA. Votre solde a été mis à jour.`);
         return;
       }
 
+      playSound('success'); // 🔊 Joue le jingle de réussite
       currentUser.completedTasks.push(taskId);
       currentUser.balance += TASK_REWARD;
       syncUserSave();
       updateDashboard();
+      alert(`✅ Bonne réponse ! Vous gagnez ${TASK_REWARD} FCFA.`);
     }
 
     function toggleAdminView() {
