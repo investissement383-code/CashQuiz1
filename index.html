@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CashQuiz - Gagnez 100 FCFA par tâche</title>
+  <title>CashQuiz Pro - Quiz d'Experts & Défis Stratégiques</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     /* Cache définitivement le badge Netlify en bas de l'écran */
@@ -16,6 +16,11 @@
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-16">
+
+  <!-- BANDEAU ÉTAT DE LA CONNEXION INTERNET -->
+  <div id="offlineBanner" class="hidden bg-rose-600 text-white text-xs py-1.5 px-4 text-center font-bold">
+    ⚠️ Vous êtes hors-ligne. Certaines fonctionnalités (paiement, parrainage) nécessitent une connexion Internet.
+  </div>
 
   <!-- Barre de notification en direct des retraits -->
   <div id="liveTicker" class="bg-emerald-800 text-emerald-100 text-xs py-2 px-4 text-center font-medium shadow-inner flex justify-center items-center space-x-2">
@@ -48,7 +53,7 @@
       <!-- Formulaire d'inscription -->
       <form id="registerForm" class="space-y-4">
         <h2 class="text-xl font-bold text-emerald-700 mb-1">Créer un compte</h2>
-        <p class="text-xs text-slate-500 mb-4">Accédez à votre tableau de bord et relevez le défi des experts !</p>
+        <p class="text-xs text-slate-500 mb-4">Connexion Internet requise. Un seul compte par email !</p>
         
         <div>
           <label class="block text-sm font-medium mb-1">Nom complet</label>
@@ -56,7 +61,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-1">Adresse Email</label>
+          <label class="block text-sm font-medium mb-1">Adresse Email (Unique)</label>
           <input type="email" id="emailInput" required placeholder="Ex: jean@gmail.com" class="w-full border rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
         </div>
 
@@ -89,17 +94,21 @@
           <input type="tel" id="phoneNumber" required placeholder="Ex: 0197000000" class="w-full border rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
         </div>
 
-        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition">Accéder à mon tableau de bord</button>
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition">S'inscrire et générer mon code</button>
       </form>
 
       <!-- Formulaire de Connexion -->
       <form id="loginForm" class="space-y-4 hidden">
         <h2 class="text-xl font-bold text-emerald-700 mb-1">Connexion</h2>
-        <p class="text-xs text-slate-500 mb-4">Entrez votre adresse email pour retrouver votre tableau de bord.</p>
+        <p class="text-xs text-slate-500 mb-4">Entrez votre adresse email enregistrée pour accéder à votre tableau de bord.</p>
 
         <div>
           <label class="block text-sm font-medium mb-1">Adresse Email enregistrée</label>
           <input type="email" id="loginEmail" required placeholder="Ex: jean@gmail.com" class="w-full border rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <div class="flex justify-end">
+          <button type="button" onclick="openForgotModal()" class="text-xs text-emerald-600 hover:underline font-medium">Mot de passe / Code oublié ?</button>
         </div>
 
         <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition">Se connecter</button>
@@ -126,7 +135,7 @@
         <div class="flex justify-between items-center">
           <div>
             <h3 class="font-bold text-sm">🔒 Compte non activé</h3>
-            <p class="text-xs mt-0.5">Réglez 4 500 FCFA via Sebpay pour valider vos quiz et retraits.</p>
+            <p class="text-xs mt-0.5">Réglez 4 500 FCFA via Sebpay pour débloquer toutes les questions et retraits.</p>
           </div>
           <button onclick="window.open('https://new.sebpay.bj/pay/cashquiz-EOCZs2', '_blank')" class="bg-white text-amber-700 font-bold px-3 py-1.5 rounded-lg text-xs shadow hover:bg-amber-50">
             Payer 4 500 F
@@ -148,7 +157,7 @@
         <div class="mt-4">
           <div class="flex justify-between text-xs text-emerald-100 mb-1">
             <span>Quiz répondus : <strong id="tasksDoneCount">0</strong> / <span id="totalTasksCount">10</span></span>
-            <span>Réussites du jour : <strong id="todayEarnings">0 F</strong></span>
+            <span>Gains : <strong id="todayEarnings">0 F</strong></span>
           </div>
           <div class="w-full bg-emerald-900/50 rounded-full h-2">
             <div id="progressBar" class="bg-amber-400 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
@@ -164,14 +173,17 @@
       </div>
 
       <!-- SECTION PARRAINAGE -->
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-        <h3 class="font-bold text-sm text-slate-700 mb-2">🤝 Gagnez 500 FCFA par Filleul</h3>
-        <p class="text-xs text-slate-500 mb-3">Partagez votre lien d'invitation sur WhatsApp :</p>
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-3">
+        <h3 class="font-bold text-sm text-slate-700">🤝 Gagnez 500 FCFA par Filleul Actif</h3>
+        <p class="text-xs text-slate-500">Le bonus de 500 F est crédité dès que votre filleul active son compte (4 500 F) :</p>
         <div class="flex gap-2">
           <input type="text" id="referralLinkInput" readonly class="w-full bg-slate-50 border rounded-lg p-2 text-xs text-slate-600 focus:outline-none">
-          <button onclick="copyReferralLink()" class="bg-emerald-600 text-white font-bold px-3 py-2 rounded-lg text-xs hover:bg-emerald-700">Copier</button>
+          <button onclick="copyReferralLink()" class="bg-emerald-600 text-white font-bold px-3 py-2 rounded-lg text-xs hover:bg-emerald-700 whitespace-nowrap">Copier</button>
         </div>
-        <div class="text-[11px] text-slate-400 mt-2">Filleuls parrainés : <strong id="referralCount">0</strong></div>
+        <button onclick="shareOnWhatsApp()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-lg text-xs transition flex items-center justify-center gap-2 shadow-sm">
+          💬 Partager directement sur WhatsApp
+        </button>
+        <div class="text-[11px] text-slate-400">Filleuls actifs validés : <strong id="referralCount">0</strong></div>
       </div>
 
       <!-- CLASSEMENT -->
@@ -180,10 +192,55 @@
         <div id="leaderboardList" class="space-y-2 text-xs"></div>
       </div>
 
+      <!-- SECTION FAQ (FOIRE AUX QUESTIONS) -->
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-3">
+        <h3 class="font-bold text-sm text-slate-700 mb-2 flex items-center gap-1.5">❓ Foire Aux Questions (FAQ)</h3>
+        
+        <div class="border-b pb-2">
+          <button onclick="toggleFaq(1)" class="w-full text-left font-semibold text-xs text-slate-800 flex justify-between items-center">
+            <span>1. Pourquoi la connexion Internet est-elle requise ?</span>
+            <span id="faqIcon1" class="text-emerald-600 font-bold">+</span>
+          </button>
+          <p id="faqAns1" class="hidden text-xs text-slate-500 mt-1.5 leading-relaxed">
+            Internet est indispensable pour valider les paiements d'activation (Sebpay), synchroniser les parrainages et sécuriser vos données en temps réel.
+          </p>
+        </div>
+
+        <div class="border-b pb-2">
+          <button onclick="toggleFaq(2)" class="w-full text-left font-semibold text-xs text-slate-800 flex justify-between items-center">
+            <span>2. Comment retrouver mon code en cas d'oubli ?</span>
+            <span id="faqIcon2" class="text-emerald-600 font-bold">+</span>
+          </button>
+          <p id="faqAns2" class="hidden text-xs text-slate-500 mt-1.5 leading-relaxed">
+            Dans l'onglet "Se connecter", cliquez sur "Mot de passe / Code oublié ?". Entrez votre email pour réafficher instantanément votre code unique de confirmation.
+          </p>
+        </div>
+
+        <div class="border-b pb-2">
+          <button onclick="toggleFaq(3)" class="w-full text-left font-semibold text-xs text-slate-800 flex justify-between items-center">
+            <span>3. Pourquoi une pénalité de -250 FCFA en cas d'erreur ?</span>
+            <span id="faqIcon3" class="text-emerald-600 font-bold">+</span>
+          </button>
+          <p id="faqAns3" class="hidden text-xs text-slate-500 mt-1.5 leading-relaxed">
+            Chaque question n'offre qu'un seul essai. Si vous vous trompez, la question se bloque, la meilleure réponse vous est révélée et une pénalité de 250 FCFA est appliquée.
+          </p>
+        </div>
+
+        <div>
+          <button onclick="toggleFaq(4)" class="w-full text-left font-semibold text-xs text-slate-800 flex justify-between items-center">
+            <span>4. Quel est le montant minimum pour un retrait ?</span>
+            <span id="faqIcon4" class="text-emerald-600 font-bold">+</span>
+          </button>
+          <p id="faqAns4" class="hidden text-xs text-slate-500 mt-1.5 leading-relaxed">
+            Dès que votre solde atteint 2 500 FCFA, vous pouvez demander un versement instantané vers votre compte Mobile Money.
+          </p>
+        </div>
+      </div>
+
       <!-- Liste des 10 Quiz du Jour -->
       <div>
         <div class="flex justify-between items-center mb-3">
-          <h3 class="font-bold text-lg text-slate-700">Les 10 quiz du jour (Difficile)</h3>
+          <h3 class="font-bold text-lg text-slate-700">Les 10 quiz du jour (Stratégie & Logique)</h3>
           <span id="dateBadge" class="text-[10px] bg-slate-200 text-slate-600 px-2 py-1 rounded font-semibold"></span>
         </div>
         <div id="tasksContainer" class="space-y-4"></div>
@@ -198,7 +255,7 @@
           <h2 class="text-lg font-bold text-slate-800">Admin CashQuiz</h2>
           <button onclick="toggleAdminView()" class="text-xs bg-slate-200 text-slate-700 px-2.5 py-1 rounded">Fermer l'Admin</button>
         </div>
-        <p class="text-xs text-slate-500 mb-4">Validez les paiements des utilisateurs inscrits pour activer leurs comptes.</p>
+        <p class="text-xs text-slate-500 mb-4">Validez les paiements des utilisateurs inscrits pour activer leurs comptes et créditer les parrains.</p>
         <div id="adminUsersList" class="space-y-3"></div>
       </div>
     </section>
@@ -210,6 +267,50 @@
         <span class="text-xs text-emerald-600 font-normal">100% Sécurisé</span>
       </h3>
       <div id="testimonialsList" class="space-y-3 text-xs"></div>
+    </div>
+
+    <!-- MODAL DE CONFIRMATION AVEC CODE À L'ÉCRAN -->
+    <div id="confirmationModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl">
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl font-bold">
+          ✓
+        </div>
+        <h3 class="text-xl font-bold text-slate-800">Compte créé avec succès !</h3>
+        <p class="text-xs text-slate-500">Voici votre code de confirmation officiel unique (lié à votre email) :</p>
+        
+        <div class="bg-slate-100 border-2 border-dashed border-emerald-500 rounded-xl py-3 px-4">
+          <span id="displayConfirmationCode" class="text-2xl font-black tracking-widest text-emerald-700"></span>
+        </div>
+
+        <p class="text-[11px] text-amber-600 font-medium">⚠️ Notez bien ce code. Il fait office de justificatif d'inscription pour votre compte.</p>
+
+        <button onclick="closeConfirmationModalAndLogin()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow">
+          Accéder à mon tableau de bord
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL MOT DE PASSE / CODE OUBLIÉ -->
+    <div id="forgotModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
+        <h3 class="text-lg font-bold text-slate-800">Récupération de compte</h3>
+        <p class="text-xs text-slate-500">Entrez l'adresse email enregistrée pour retrouver votre code de confirmation :</p>
+        
+        <div>
+          <label class="block text-xs font-medium mb-1">Votre email</label>
+          <input type="email" id="forgotEmailInput" placeholder="Ex: jean@gmail.com" class="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <div id="forgotResultArea" class="hidden bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-center">
+          <div class="text-[11px] text-emerald-800 mb-1 font-medium">Votre code secret retrouvé :</div>
+          <div id="foundCodeDisplay" class="text-xl font-black text-emerald-700 tracking-wider"></div>
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button onclick="closeForgotModal()" class="w-1/2 bg-slate-200 text-slate-700 py-2.5 rounded-xl font-medium text-xs">Fermer</button>
+          <button onclick="recoverCode()" class="w-1/2 bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs">Rechercher</button>
+        </div>
+      </div>
     </div>
 
     <!-- MODAL DE RETRAIT -->
@@ -229,6 +330,71 @@
   </main>
 
   <script>
+    // --- SURVEILLANCE DE LA CONNEXION INTERNET ---
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    function updateOnlineStatus() {
+      const banner = document.getElementById('offlineBanner');
+      if (!navigator.onLine) {
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+    updateOnlineStatus();
+
+    // --- GESTION DE LA FAQ ---
+    function toggleFaq(id) {
+      const ans = document.getElementById(`faqAns${id}`);
+      const icon = document.getElementById(`faqIcon${id}`);
+      if (ans.classList.contains('hidden')) {
+        ans.classList.remove('hidden');
+        icon.textContent = '-';
+      } else {
+        ans.classList.add('hidden');
+        icon.textContent = '+';
+      }
+    }
+
+    // --- MOT DE PASSE / CODE OUBLIÉ ---
+    function openForgotModal() {
+      document.getElementById('forgotEmailInput').value = '';
+      document.getElementById('forgotResultArea').classList.add('hidden');
+      document.getElementById('forgotModal').classList.remove('hidden');
+    }
+
+    function closeForgotModal() {
+      document.getElementById('forgotModal').classList.add('hidden');
+    }
+
+    function recoverCode() {
+      const email = document.getElementById('forgotEmailInput').value.trim().toLowerCase();
+      if (!email) {
+        alert("Veuillez entrer une adresse email.");
+        return;
+      }
+
+      const user = allUsers.find(u => u.email.toLowerCase() === email);
+      const resultArea = document.getElementById('forgotResultArea');
+      const codeDisplay = document.getElementById('foundCodeDisplay');
+
+      if (user) {
+        codeDisplay.textContent = user.code || "849201";
+        resultArea.classList.remove('hidden');
+      } else {
+        resultArea.classList.add('hidden');
+        alert("Aucun compte enregistré avec cette adresse email.");
+      }
+    }
+
+    // --- PARTAGE WHATSAPP ---
+    function shareOnWhatsApp() {
+      const refLink = document.getElementById('referralLinkInput').value;
+      const text = encodeURIComponent(`🔥 J'ai découvert CashQuiz ! Une plateforme de quiz stratégiques et d'analyse où l'on gagne de l'argent réel. Viens tester ton niveau et activer ton compte ici : ${refLink}`);
+      window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+    }
+
     // --- SYNTHÈSE AUDIO / SONS DE SUCCÈS ET D'ÉCHEC ---
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -287,24 +453,24 @@
 
     const TASK_REWARD = 100;     // Gain par bonne réponse
     const TASK_PENALTY = 250;    // Pénalité par mauvaise réponse
+    const FREE_QUESTIONS_LIMIT = 2; // Nombre de questions gratuites
+    const REFERRAL_BONUS = 500;  // Bonus par parrainage validé
     const ADMIN_PASSWORD = "admin2026";
     const SEBPAY_URL = "https://new.sebpay.bj/pay/cashquiz-EOCZs2";
     const TELEGRAM_CHANNEL = "https://t.me/+IOETEIV5ddg0ZTM0";
 
-    // --- BANQUE DE QUESTIONS EXPERTES ---
+    // --- BANQUE DE QUESTIONS STRATÉGIQUES ANTI-GOOGLE / ANTI-IA ---
     const masterQuestionBank = [
-      { id: 1, category: "Géopolitique Africaine", question: "Quel accord de libre-échange continental (ZLECAf) a été officiellement lancé sous l'égide de quelle institution en 2018 ? (Ville du siège)", options: ["Addis-Abeba (UA)", "Abuja (CEDEAO)", "Dakar (BCEAO)", "Nairobi (COMESA)"], answer: "Addis-Abeba (UA)" },
-      { id: 2, category: "Macro-Économie", question: "Quel taux directeur la BCEAO a-t-elle principalement utilisé pour réguler l'inflation dans l'espace UEMOA ?", options: ["3,25 %", "2,50 %", "4,50 %", "5,00 %"], answer: "3,25 %" },
-      { id: 3, category: "Histoire & Souveraineté", question: "En quelle année exacte fut ratifiée la convention de création de l'Organisation de l'Unité Africaine (OUA) ?", options: ["1960", "1963", "1969", "1975"], answer: "1963" },
-      { id: 4, category: "Géographie Avancée", question: "Quel est le point culminant du grand rift africain situé en Tanzanie ?", options: ["Mont Kenya", "Mont Kilimandjaro (Kibo)", "Mont Elgon", "Mont Stanley"], answer: "Mont Kilimandjaro (Kibo)" },
-      { id: 5, category: "Droit & Institutions", question: "Quel traité harmonise le droit des affaires en Afrique à travers l'espace OHADA ?", options: ["Traité de Port-Louis", "Traité de Lagos", "Traité de Dakar", "Traité de Libreville"], answer: "Traité de Port-Louis" },
-      { id: 6, category: "Énergie & Technologie", question: "Quel pays africain détient les plus grandes réserves prouvées de platine et de manganèse au monde ?", options: ["Le Ghana", "L'Afrique du Sud", "La RDC", "Le Gabon"], answer: "L'Afrique du Sud" },
-      { id: 7, category: "Sciences & Numérique", question: "Quel protocole cryptographique sous-tend la scalabilité des réseaux de couche 2 sur Ethereum ?", options: ["Proof of Work", "Zero-Knowledge Rollups", "Proof of Burn", "Delegated Proof of Stake"], answer: "Zero-Knowledge Rollups" },
-      { id: 8, category: "Économie Monétaire", question: "Quelle est la parité fixe historique initiale entre l'Euro et le Franc CFA instaurée dès 1999 ?", options: ["1 EUR = 600 FCFA", "1 EUR = 655,957 FCFA", "1 EUR = 500 FCFA", "1 EUR = 700 FCFA"], answer: "1 EUR = 655,957 FCFA" },
-      { id: 9, category: "Géopolitique Mondiale", question: "Combien de membres non permanents composent le Conseil de sécurité des Nations unies ?", options: ["5", "10", "15", "7"], answer: "10" },
-      { id: 10, category: "Histoire Ancienne", question: "Sous quel règne l'empire du Mali a-t-il atteint son apogée territorial et culturel au XIVe siècle ?", options: ["Soundiata Keïta", "Kanga Moussa (Mansa Moussa)", "Soumaoro Kanté", "Askia Mohammed"], answer: "Kanga Moussa (Mansa Moussa)" },
-      { id: 11, category: "Démographie & Sociologie", question: "Selon l'ONU, quelle part de la population mondiale la jeunesse africaine représentera-t-elle en 2050 ?", options: ["10 %", "25 %", "40 %", "60 %"], answer: "25 %" },
-      { id: 12, category: "Institutions Financières", question: "Quelle institution internationale fait office de prêteur en dernier ressort pour la balance des paiements ?", options: ["La Banque Mondiale", "Le FMI (Fonds Monétaire International)", "La SFI", "La BAD"], answer: "Le FMI (Fonds Monétaire International)" }
+      { id: 1, category: "Logique & Analyse", question: "Si un entrepreneur investit 4 500 F dans un actif numérique générant 100 F par tâche validée (avec une pénalité de 250 F par échec), combien de bonnes réponses sans aucune erreur faut-il pour atteindre exactement le seuil de rentabilité du capital initial ?", options: ["35 réponses", "45 réponses", "50 réponses", "60 réponses"], answer: "45 réponses" },
+      { id: 2, category: "Étude de Cas Économique", question: "Dans un marché monétaire où le taux directeur augmente de 75 points de base, quel impact direct observe-t-on généralement sur le coût du crédit bancaire pour les PME ?", options: ["Une baisse immédiate des taux d'emprunt", "Une hausse proportionnelle du coût du crédit", "Un gel total de la masse monétaire en circulation", "Une annulation des garanties bancaires"], answer: "Une hausse proportionnelle du coût du crédit" },
+      { id: 3, category: "Raisonnement & Séquence", question: "Parmi ces propositions, quelle condition est indispensable et préalable pour qu'un parrain touche sa commission de 500 FCFA sur CashQuiz ?", options: ["Que le filleul crée simplement son compte", "Que le filleul valide ses 2 quiz gratuits", "Que le filleul active son compte via le paiement de l'adhésion", "Que le parrain réalise un retrait minimum"], answer: "Que le filleul active son compte via le paiement de l'adhésion" },
+      { id: 4, category: "Analyse Stratégique", question: "Pourquoi l'instauration d'une pénalité supérieure au gain (250 F de perte contre 100 F de gain) protège-t-elle l'écosystème global de la plateforme ?", options: ["Elle favorise le tâtonnement aléatoire", "Elle force la réflexion et élimine le spam de réponses au hasard", "Elle augmente artificiellement l'inflation monétaire", "Elle supprime l'utilité des parrainages"], answer: "Elle force la réflexion et élimine le spam de réponses au hasard" },
+      { id: 5, category: "Mathématiques Financières", question: "Un utilisateur dispose d'un solde de 2 800 FCFA. Il commet 2 erreurs consécutives (-250 F chacune) et réussit 5 bonnes réponses (+100 F chacune). Quel est son nouveau solde exact ?", options: ["3 000 FCFA", "2 800 FCFA", "3 500 FCFA", "2 300 FCFA"], answer: "2 800 FCFA" },
+      { id: 6, category: "Gouvernance & Numérique", question: "Quel est l'objectif principal de l'obligation d'un paiement d'activation unique de 4 500 FCFA sur une plateforme de micro-tâches en ligne ?", options: ["Ralentir volontairement le trafic du site", "Filtrer les utilisateurs sérieux et financer la pérennité des cagnottes", "Empêcher l'accès aux smartphones", "Remplacer le système bancaire traditionnel"], answer: "Filtrer les utilisateurs sérieux et financer la pérennité des cagnottes" },
+      { id: 7, category: "Logique Déductive", question: "Si une question du jour affiche un statut 'Bloquée' suite à une mauvaise réponse, que se passe-t-il pour cette question spécifique le lendemain à minuit lors de la rotation automatique ?", options: ["Elle reste définitivement bloquée à vie", "Elle est réinitialisée avec une nouvelle session de questions quotidiennes", "Le montant de la pénalité est doublé", "Le compte utilisateur est suspendu"], answer: "Elle est réinitialisée avec une nouvelle session de questions quotidiennes" },
+      { id: 8, category: "Évaluation de Risque", question: "Dans le cadre de la gestion d'un portefeuille de micro-investissements en ligne, quel comportement caractérise une stratégie prudente face à la volatilité ?", options: ["Investir la totalité de son capital sur un seul actif", "Diversifier ses sources de revenus et valider les conditions contractuelles", "Ignorer les frais de transaction", "Emprunter à taux variable élevé"], answer: "Diversifier ses sources de revenus et valider les conditions contractuelles" },
+      { id: 9, category: "Sécurité & Authentification", question: "Pourquoi l'utilisation d'une session locale sécurisée (LocalStorage) couplée à un panneau administrateur protégé est-elle nécessaire sur ce type de prototype web ?", options: ["Pour stocker les mots de passe en clair sur les réseaux sociaux", "Pour simuler de manière fluide et autonome la gestion des utilisateurs et des soldes", "Pour autoriser n'importe quel visiteur à modifier les soldes", "Pour ralentir la connexion internet"], answer: "Pour simuler de manière fluide et autonome la gestion des utilisateurs et des soldes" },
+      { id: 10, category: "Psychologie du Consommateur", question: "Quel levier marketing pousse le plus efficacement un utilisateur hésitant à franchir le pas de l'activation payante ?", options: ["L'absence totale d'explications", "Le mode découverte gratuit combiné à des preuves sociales de retraits", "L'anonymat complet du créateur", "La suppression des classements"], answer: "Le mode découverte gratuit combiné à des preuves sociales de retraits" }
     ];
 
     function getTodayKey() {
@@ -312,7 +478,6 @@
       return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
     }
 
-    // --- ROTATION EXACTE DE 10 QUESTIONS PAR JOUR ---
     function getDailyTasks() {
       const today = new Date();
       const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
@@ -351,14 +516,22 @@
     ];
 
     let allUsers = JSON.parse(localStorage.getItem('cashquiz_all_users')) || [
-      { id: "usr_1", name: "Jean Kouassi", email: "jean@gmail.com", country: "Côte d'Ivoire (+225)", phone: "0197000000", time: "12/11/2026 à 14:30", isPaid: true, balance: 3500, completedTasks: [], failedTasks: [], lastQuizDate: getTodayKey(), referrals: 2 }
+      { id: "usr_1", name: "Jean Kouassi", email: "jean@gmail.com", country: "Côte d'Ivoire (+225)", phone: "0197000000", code: "849201", time: "12/11/2026 à 14:30", isPaid: true, balance: 3500, completedTasks: [], failedTasks: [], lastQuizDate: getTodayKey(), referredBy: null, referrals: 2 }
     ];
 
     let currentUser = JSON.parse(localStorage.getItem('cashquiz_current_user')) || null;
+    let newlyCreatedUser = null;
     let isAdminView = false;
     let clickCount = 0;
 
-    // Réinitialise l'historique quotidien si on a changé de jour
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const refId = urlParams.get('ref');
+      if (refId) {
+        localStorage.setItem('cashquiz_pending_ref', refId);
+      }
+    });
+
     function ensureUserDailyReset(user) {
       const todayKey = getTodayKey();
       if (!user.failedTasks) user.failedTasks = [];
@@ -468,44 +641,62 @@
 
     document.getElementById('registerForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const now = new Date();
-      const timeStr = `${now.toLocaleDateString()} à ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+      const emailInput = document.getElementById('emailInput').value.trim().toLowerCase();
       
-      const email = document.getElementById('emailInput').value.trim();
-      const existing = allUsers.find(u => u.email === email);
-      if (existing) {
-        alert("Cet email est déjà utilisé. Veuillez vous connecter.");
+      const existingUser = allUsers.find(u => u.email.toLowerCase() === emailInput);
+      if (existingUser) {
+        alert("❌ Cette adresse email est déjà utilisée par un autre compte !\nVeuillez vous connecter avec cet email ou en utiliser un autre.");
         switchAuthTab('login');
+        document.getElementById('loginEmail').value = emailInput;
         return;
       }
 
+      const now = new Date();
+      const timeStr = `${now.toLocaleDateString()} à ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+      const confirmationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const pendingRef = localStorage.getItem('cashquiz_pending_ref');
+
       const newUser = {
         id: 'usr_' + Date.now(),
-        name: document.getElementById('fullName').value,
-        email: email,
+        name: document.getElementById('fullName').value.trim(),
+        email: emailInput,
         country: document.getElementById('countrySelect').value,
-        phone: document.getElementById('phoneNumber').value,
+        phone: document.getElementById('phoneNumber').value.trim(),
+        code: confirmationCode,
         time: timeStr,
         isPaid: false,
         balance: 0,
         completedTasks: [],
         failedTasks: [],
         lastQuizDate: getTodayKey(),
+        referredBy: pendingRef || null,
         referrals: 0
       };
 
       allUsers.push(newUser);
       saveAllUsers();
+      localStorage.removeItem('cashquiz_pending_ref');
 
-      currentUser = newUser;
-      saveCurrentSession();
-      renderApp();
+      newlyCreatedUser = newUser;
+
+      document.getElementById('displayConfirmationCode').textContent = confirmationCode;
+      document.getElementById('confirmationModal').classList.remove('hidden');
     });
+
+    function closeConfirmationModalAndLogin() {
+      document.getElementById('confirmationModal').classList.add('hidden');
+      if (newlyCreatedUser) {
+        currentUser = newlyCreatedUser;
+        saveCurrentSession();
+        newlyCreatedUser = null;
+        renderApp();
+      }
+    }
 
     document.getElementById('loginForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const email = document.getElementById('loginEmail').value.trim();
-      const found = allUsers.find(u => u.email === email);
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const found = allUsers.find(u => u.email.toLowerCase() === email);
 
       if (!found) {
         alert("Aucun compte trouvé avec cet email. Veuillez vous inscrire.");
@@ -552,12 +743,16 @@
       dailyTasks.forEach(task => {
         const isDone = currentUser.completedTasks.includes(task.id);
         const isFailed = (currentUser.failedTasks || []).includes(task.id);
-        const isLocked = isDone || isFailed;
+        const isLockedByAnswer = isDone || isFailed;
+        
+        const isFreeTrialLocked = !currentUser.isPaid && task.id > FREE_QUESTIONS_LIMIT;
+        const isLocked = isLockedByAnswer || isFreeTrialLocked;
 
         const card = document.createElement('div');
         card.className = `bg-white p-4 rounded-xl shadow-sm border ${
           isDone ? 'border-emerald-300 bg-emerald-50/30' : 
           isFailed ? 'border-rose-300 bg-rose-50/30' : 
+          isFreeTrialLocked ? 'border-amber-200 bg-amber-50/20 opacity-90' :
           'border-slate-200'
         }`;
         
@@ -566,7 +761,7 @@
           let optionStyle = "border-slate-200 hover:bg-slate-50";
           let badgeHtml = "";
 
-          if (isLocked && isCorrectOption) {
+          if (isLockedByAnswer && isCorrectOption) {
             optionStyle = "border-emerald-500 bg-emerald-50 font-semibold text-emerald-800";
             badgeHtml = `<span class="ml-auto text-[11px] font-bold text-emerald-700">✓ Meilleure réponse</span>`;
           } else if (isLocked) {
@@ -575,7 +770,7 @@
 
           return `
             <label class="flex items-center space-x-2 p-2 border rounded-lg ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'} text-sm ${optionStyle}">
-              <input type="radio" name="task_${task.id}" value="${opt}" ${isLocked ? 'disabled' : ''} ${isLocked && isCorrectOption ? 'checked' : ''}>
+              <input type="radio" name="task_${task.id}" value="${opt}" ${isLocked ? 'disabled' : ''} ${isLockedByAnswer && isCorrectOption ? 'checked' : ''}>
               <span>${opt}</span>
               ${badgeHtml}
             </label>
@@ -592,13 +787,28 @@
               <div class="mt-1">La bonne réponse était : <strong class="underline text-emerald-800">${task.answer}</strong></div>
             </div>
           `;
+        } else if (isFreeTrialLocked) {
+          actionHtml = `
+            <div class="bg-amber-100 border border-amber-200 text-amber-900 text-xs p-3 rounded-lg flex flex-col gap-2">
+              <div class="font-bold flex items-center gap-1">🔒 Question réservée aux membres VIP</div>
+              <p class="text-[11px]">Vous avez épuisé vos 2 questions d'essai gratuit. Activez votre compte pour débloquer cette question et encaisser vos gains !</p>
+              <button onclick="window.open('${SEBPAY_URL}', '_blank')" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded-lg transition text-center">
+                Payer l'adhésion (4 500 F)
+              </button>
+            </div>
+          `;
         } else {
           actionHtml = `<button onclick="submitTask(${task.id})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg transition">Valider la réponse (1 seul essai)</button>`;
         }
 
+        let badgeTrialText = (!currentUser.isPaid && task.id <= FREE_QUESTIONS_LIMIT) ? `<span class="text-[10px] bg-sky-100 text-sky-800 px-2 py-0.5 rounded font-bold ml-2">🎁 Essai Gratuit</span>` : "";
+
         card.innerHTML = `
           <div class="flex justify-between items-center mb-2">
-            <span class="text-xs font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">${task.category}</span>
+            <div>
+              <span class="text-xs font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">${task.category}</span>
+              ${badgeTrialText}
+            </div>
             <span class="text-xs font-bold text-amber-600">+100 F (⚠️ -250 F si faux)</span>
           </div>
           <p class="font-medium text-sm mb-3 text-slate-800">${task.question}</p>
@@ -617,10 +827,11 @@
     }
 
     function submitTask(taskId) {
-      if (!currentUser.isPaid) {
-        if (confirm("🔒 Compte non activé !\n\nVeuillez régler les frais d'adhésion de 4 500 FCFA via Sebpay pour pouvoir valider les quiz et encaisser vos gains.\n\nVoulez-vous ouvrir la page de paiement Sebpay maintenant ?")) {
-          window.open(SEBPAY_URL, '_blank');
-        }
+      const task = dailyTasks.find(t => t.id === taskId);
+      
+      if (!currentUser.isPaid && taskId > FREE_QUESTIONS_LIMIT) {
+        alert("Veuillez activer votre compte via Sebpay pour accéder à cette question.");
+        window.open(SEBPAY_URL, '_blank');
         return;
       }
 
@@ -634,10 +845,7 @@
         alert("Veuillez sélectionner une réponse.");
         return;
       }
-
-      const task = dailyTasks.find(t => t.id === taskId);
       
-      // Mauvaise réponse : pénalité de 250 FCFA + blocage de la question + révélation de la bonne réponse
       if (task.answer && selected.value !== task.answer) {
         playSound('error');
         currentUser.failedTasks.push(taskId);
@@ -648,7 +856,6 @@
         return;
       }
 
-      // Bonne réponse : gain de 100 FCFA
       playSound('success');
       currentUser.completedTasks.push(taskId);
       currentUser.balance += TASK_REWARD;
@@ -674,10 +881,11 @@
           <div class="flex justify-between items-start">
             <strong class="text-slate-800 text-sm">${u.name}</strong>
             <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-              ${u.isPaid ? 'Actif (Payé)' : 'En attente de paiement'}
+              ${u.isPaid ? 'Actif (Payé)' : 'Découverte Gratuite'}
             </span>
           </div>
           <div class="text-slate-600">📧 Email : <strong>${u.email}</strong></div>
+          <div class="text-slate-600">🔑 Code : <strong class="text-emerald-700">${u.code || 'N/A'}</strong></div>
           <div class="text-slate-600">📱 Numéro : <strong>${u.phone}</strong></div>
           <div class="pt-2 flex gap-2">
             ${!u.isPaid 
@@ -691,15 +899,28 @@
 
     function adminValidateUser(userId) {
       const user = allUsers.find(u => u.id === userId);
-      if (user) {
+      if (user && !user.isPaid) {
         user.isPaid = true;
+
+        if (user.referredBy) {
+          const sponsor = allUsers.find(s => s.id === user.referredBy);
+          if (sponsor) {
+            sponsor.balance += REFERRAL_BONUS;
+            sponsor.referrals = (sponsor.referrals || 0) + 1;
+            if (currentUser && currentUser.id === sponsor.id) {
+              currentUser.balance = sponsor.balance;
+              currentUser.referrals = sponsor.referrals;
+            }
+          }
+        }
+
         saveAllUsers();
         if (currentUser && currentUser.id === userId) {
           currentUser.isPaid = true;
           saveCurrentSession();
         }
         renderAdminPanel();
-        alert(`Compte de ${user.name} activé avec succès !`);
+        alert(`Compte de ${user.name} activé avec succès ! ${user.referredBy ? 'Le parrain a reçu son bonus de 500 FCFA.' : ''}`);
       }
     }
 
