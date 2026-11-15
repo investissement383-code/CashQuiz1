@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CashQuiz - Gagnez 250 FCFA par tâche</title>
+  <title>CashQuiz - Gagnez 100 FCFA par tâche</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     /* Cache définitivement le badge Netlify en bas de l'écran */
@@ -147,8 +147,8 @@
         <!-- Progression quotidienne -->
         <div class="mt-4">
           <div class="flex justify-between text-xs text-emerald-100 mb-1">
-            <span>Quiz du jour : <strong id="tasksDoneCount">0</strong> / <span id="totalTasksCount">10</span></span>
-            <span>Gains : <strong id="todayEarnings">0</strong> F</span>
+            <span>Quiz répondus : <strong id="tasksDoneCount">0</strong> / <span id="totalTasksCount">10</span></span>
+            <span>Réussites du jour : <strong id="todayEarnings">0 F</strong></span>
           </div>
           <div class="w-full bg-emerald-900/50 rounded-full h-2">
             <div id="progressBar" class="bg-amber-400 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
@@ -156,7 +156,7 @@
         </div>
         
         <div class="mt-4 pt-4 border-t border-emerald-500/40 flex justify-between items-center text-sm">
-          <span class="text-xs text-emerald-100">250 FCFA / bonne réponse (⚠️ -250 F si faux)</span>
+          <span class="text-xs text-emerald-100">+100 F / juste (⚠️ -250 F si faux • 1 essai)</span>
           <button onclick="openWithdrawModal()" class="bg-white text-emerald-700 font-bold px-4 py-1.5 rounded-lg text-xs hover:bg-emerald-50 transition shadow-sm">
             Retirer (MoMo)
           </button>
@@ -218,7 +218,7 @@
         <h3 class="text-lg font-bold mb-2">Retrait Mobile Money</h3>
         <p class="text-xs text-slate-500 mb-4">Numéro enregistré : <strong id="withdrawPhoneDisplay"></strong></p>
         <label class="block text-sm font-medium mb-1">Montant (Min. 2 500 FCFA)</label>
-        <input type="number" id="withdrawAmount" min="2500" step="250" placeholder="Ex: 5000" class="w-full border rounded-lg p-2.5 mb-4">
+        <input type="number" id="withdrawAmount" min="2500" step="100" placeholder="Ex: 5000" class="w-full border rounded-lg p-2.5 mb-4">
         <div class="flex gap-2">
           <button onclick="closeWithdrawModal()" class="w-1/2 bg-slate-200 text-slate-700 py-2 rounded-lg font-medium">Annuler</button>
           <button onclick="processWithdraw()" class="w-1/2 bg-emerald-600 text-white py-2 rounded-lg font-bold">Confirmer</button>
@@ -285,12 +285,13 @@
     }
     setInterval(removeNetlifyBadge, 500);
 
-    const TASK_REWARD = 250;
+    const TASK_REWARD = 100;     // Gain par bonne réponse
+    const TASK_PENALTY = 250;    // Pénalité par mauvaise réponse
     const ADMIN_PASSWORD = "admin2026";
     const SEBPAY_URL = "https://new.sebpay.bj/pay/cashquiz-EOCZs2";
     const TELEGRAM_CHANNEL = "https://t.me/+IOETEIV5ddg0ZTM0";
 
-    // --- BANQUE DE QUESTIONS EXPERTES (Sélection stricte de 10 par jour) ---
+    // --- BANQUE DE QUESTIONS EXPERTES ---
     const masterQuestionBank = [
       { id: 1, category: "Géopolitique Africaine", question: "Quel accord de libre-échange continental (ZLECAf) a été officiellement lancé sous l'égide de quelle institution en 2018 ? (Ville du siège)", options: ["Addis-Abeba (UA)", "Abuja (CEDEAO)", "Dakar (BCEAO)", "Nairobi (COMESA)"], answer: "Addis-Abeba (UA)" },
       { id: 2, category: "Macro-Économie", question: "Quel taux directeur la BCEAO a-t-elle principalement utilisé pour réguler l'inflation dans l'espace UEMOA ?", options: ["3,25 %", "2,50 %", "4,50 %", "5,00 %"], answer: "3,25 %" },
@@ -305,6 +306,11 @@
       { id: 11, category: "Démographie & Sociologie", question: "Selon l'ONU, quelle part de la population mondiale la jeunesse africaine représentera-t-elle en 2050 ?", options: ["10 %", "25 %", "40 %", "60 %"], answer: "25 %" },
       { id: 12, category: "Institutions Financières", question: "Quelle institution internationale fait office de prêteur en dernier ressort pour la balance des paiements ?", options: ["La Banque Mondiale", "Le FMI (Fonds Monétaire International)", "La SFI", "La BAD"], answer: "Le FMI (Fonds Monétaire International)" }
     ];
+
+    function getTodayKey() {
+      const today = new Date();
+      return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+    }
 
     // --- ROTATION EXACTE DE 10 QUESTIONS PAR JOUR ---
     function getDailyTasks() {
@@ -322,7 +328,6 @@
         shuffled[i] = t;
       }
 
-      // Exactement 10 questions par jour
       return shuffled.slice(0, 10).map((q, index) => ({
         ...q,
         id: index + 1
@@ -346,12 +351,25 @@
     ];
 
     let allUsers = JSON.parse(localStorage.getItem('cashquiz_all_users')) || [
-      { id: "usr_1", name: "Jean Kouassi", email: "jean@gmail.com", country: "Côte d'Ivoire (+225)", phone: "0197000000", time: "12/11/2026 à 14:30", isPaid: true, balance: 3500, completedTasks: [], referrals: 2, lastStreakDate: "" }
+      { id: "usr_1", name: "Jean Kouassi", email: "jean@gmail.com", country: "Côte d'Ivoire (+225)", phone: "0197000000", time: "12/11/2026 à 14:30", isPaid: true, balance: 3500, completedTasks: [], failedTasks: [], lastQuizDate: getTodayKey(), referrals: 2 }
     ];
 
     let currentUser = JSON.parse(localStorage.getItem('cashquiz_current_user')) || null;
     let isAdminView = false;
     let clickCount = 0;
+
+    // Réinitialise l'historique quotidien si on a changé de jour
+    function ensureUserDailyReset(user) {
+      const todayKey = getTodayKey();
+      if (!user.failedTasks) user.failedTasks = [];
+      if (!user.completedTasks) user.completedTasks = [];
+      if (user.lastQuizDate !== todayKey) {
+        user.completedTasks = [];
+        user.failedTasks = [];
+        user.lastQuizDate = todayKey;
+        syncUserSave();
+      }
+    }
 
     function secretAdminTrigger() {
       clickCount++;
@@ -440,6 +458,7 @@
       if (!currentUser) {
         document.getElementById('authSection').classList.remove('hidden');
       } else {
+        ensureUserDailyReset(currentUser);
         document.getElementById('dashboardSection').classList.remove('hidden');
         document.getElementById('logoutBtn').classList.remove('hidden');
         document.getElementById('testimonialsSection').classList.add('hidden');
@@ -470,8 +489,9 @@
         isPaid: false,
         balance: 0,
         completedTasks: [],
-        referrals: 0,
-        lastStreakDate: ""
+        failedTasks: [],
+        lastQuizDate: getTodayKey(),
+        referrals: 0
       };
 
       allUsers.push(newUser);
@@ -500,12 +520,14 @@
 
     function updateDashboard() {
       const doneCount = currentUser.completedTasks.length;
+      const failedCount = (currentUser.failedTasks || []).length;
+      const totalAttempted = doneCount + failedCount;
       const earnedToday = doneCount * TASK_REWARD;
-      const progressPercent = (doneCount / dailyTasks.length) * 100;
+      const progressPercent = (totalAttempted / dailyTasks.length) * 100;
 
       document.getElementById('userNameDisplay').textContent = currentUser.name;
       document.getElementById('balanceDisplay').textContent = currentUser.balance.toLocaleString('fr-FR');
-      document.getElementById('tasksDoneCount').textContent = doneCount;
+      document.getElementById('tasksDoneCount').textContent = totalAttempted;
       document.getElementById('totalTasksCount').textContent = dailyTasks.length;
       document.getElementById('todayEarnings').textContent = earnedToday.toLocaleString('fr-FR') + " F";
       document.getElementById('progressBar').style.width = `${progressPercent}%`;
@@ -529,27 +551,59 @@
 
       dailyTasks.forEach(task => {
         const isDone = currentUser.completedTasks.includes(task.id);
+        const isFailed = (currentUser.failedTasks || []).includes(task.id);
+        const isLocked = isDone || isFailed;
+
         const card = document.createElement('div');
-        card.className = `bg-white p-4 rounded-xl shadow-sm border ${isDone ? 'border-emerald-200 opacity-65' : 'border-slate-200'}`;
+        card.className = `bg-white p-4 rounded-xl shadow-sm border ${
+          isDone ? 'border-emerald-300 bg-emerald-50/30' : 
+          isFailed ? 'border-rose-300 bg-rose-50/30' : 
+          'border-slate-200'
+        }`;
         
-        let optionsHtml = task.options.map(opt => `
-          <label class="flex items-center space-x-2 p-2 border rounded-lg cursor-pointer hover:bg-slate-50 text-sm">
-            <input type="radio" name="task_${task.id}" value="${opt}" ${isDone ? 'disabled' : ''}>
-            <span>${opt}</span>
-          </label>
-        `).join('');
+        let optionsHtml = task.options.map(opt => {
+          const isCorrectOption = opt === task.answer;
+          let optionStyle = "border-slate-200 hover:bg-slate-50";
+          let badgeHtml = "";
+
+          if (isLocked && isCorrectOption) {
+            optionStyle = "border-emerald-500 bg-emerald-50 font-semibold text-emerald-800";
+            badgeHtml = `<span class="ml-auto text-[11px] font-bold text-emerald-700">✓ Meilleure réponse</span>`;
+          } else if (isLocked) {
+            optionStyle = "border-slate-200 opacity-60";
+          }
+
+          return `
+            <label class="flex items-center space-x-2 p-2 border rounded-lg ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'} text-sm ${optionStyle}">
+              <input type="radio" name="task_${task.id}" value="${opt}" ${isLocked ? 'disabled' : ''} ${isLocked && isCorrectOption ? 'checked' : ''}>
+              <span>${opt}</span>
+              ${badgeHtml}
+            </label>
+          `;
+        }).join('');
+
+        let actionHtml = '';
+        if (isDone) {
+          actionHtml = `<button disabled class="w-full bg-emerald-100 text-emerald-800 text-xs font-bold py-2.5 rounded-lg">✅ Validée (+100 FCFA)</button>`;
+        } else if (isFailed) {
+          actionHtml = `
+            <div class="bg-rose-100 border border-rose-200 text-rose-800 text-xs p-2.5 rounded-lg">
+              <div class="font-bold">❌ Mauvaise réponse (-250 FCFA) • Question bloquée</div>
+              <div class="mt-1">La bonne réponse était : <strong class="underline text-emerald-800">${task.answer}</strong></div>
+            </div>
+          `;
+        } else {
+          actionHtml = `<button onclick="submitTask(${task.id})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg transition">Valider la réponse (1 seul essai)</button>`;
+        }
 
         card.innerHTML = `
           <div class="flex justify-between items-center mb-2">
             <span class="text-xs font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">${task.category}</span>
-            <span class="text-xs font-bold text-amber-600">+250 FCFA (⚠️ -250 F si faux)</span>
+            <span class="text-xs font-bold text-amber-600">+100 F (⚠️ -250 F si faux)</span>
           </div>
           <p class="font-medium text-sm mb-3 text-slate-800">${task.question}</p>
           <div class="space-y-2 mb-3">${optionsHtml}</div>
-          ${isDone 
-            ? `<button disabled class="w-full bg-slate-200 text-slate-500 text-xs font-bold py-2 rounded-lg">Question validée (+250 FCFA)</button>`
-            : `<button onclick="submitTask(${task.id})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-lg transition">Valider la réponse</button>`
-          }
+          ${actionHtml}
         `;
         container.appendChild(card);
       });
@@ -570,7 +624,10 @@
         return;
       }
 
-      if (currentUser.completedTasks.includes(taskId)) return;
+      if (!currentUser.failedTasks) currentUser.failedTasks = [];
+      if (currentUser.completedTasks.includes(taskId) || currentUser.failedTasks.includes(taskId)) {
+        return;
+      }
 
       const selected = document.querySelector(`input[name="task_${taskId}"]:checked`);
       if (!selected) {
@@ -580,15 +637,18 @@
 
       const task = dailyTasks.find(t => t.id === taskId);
       
+      // Mauvaise réponse : pénalité de 250 FCFA + blocage de la question + révélation de la bonne réponse
       if (task.answer && selected.value !== task.answer) {
         playSound('error');
-        currentUser.balance = Math.max(0, currentUser.balance - TASK_REWARD);
+        currentUser.failedTasks.push(taskId);
+        currentUser.balance = Math.max(0, currentUser.balance - TASK_PENALTY);
         syncUserSave();
         updateDashboard();
-        alert(`❌ Mauvaise réponse !\n\nVous perdez ${TASK_REWARD} FCFA. Votre solde a été mis à jour.`);
+        alert(`❌ Mauvaise réponse !\n\nVous perdez ${TASK_PENALTY} FCFA et cette question est désormais bloquée.\n\n💡 La meilleure réponse était : "${task.answer}"`);
         return;
       }
 
+      // Bonne réponse : gain de 100 FCFA
       playSound('success');
       currentUser.completedTasks.push(taskId);
       currentUser.balance += TASK_REWARD;
