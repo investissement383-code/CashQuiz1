@@ -48,7 +48,7 @@
       <!-- Formulaire d'inscription -->
       <form id="registerForm" class="space-y-4">
         <h2 class="text-xl font-bold text-emerald-700 mb-1">Créer un compte</h2>
-        <p class="text-xs text-slate-500 mb-4">Accédez à votre tableau de bord et commencez à explorer les quiz !</p>
+        <p class="text-xs text-slate-500 mb-4">Accédez à votre tableau de bord et relevez le défi des experts !</p>
         
         <div>
           <label class="block text-sm font-medium mb-1">Nom complet</label>
@@ -147,8 +147,8 @@
         <!-- Progression quotidienne -->
         <div class="mt-4">
           <div class="flex justify-between text-xs text-emerald-100 mb-1">
-            <span>Quiz du jour : <strong id="tasksDoneCount">0</strong> / 20</span>
-            <span>Gains : <strong id="todayEarnings">0</strong> / 5 000 F</span>
+            <span>Quiz du jour : <strong id="tasksDoneCount">0</strong> / <span id="totalTasksCount">10</span></span>
+            <span>Gains : <strong id="todayEarnings">0</strong> F</span>
           </div>
           <div class="w-full bg-emerald-900/50 rounded-full h-2">
             <div id="progressBar" class="bg-amber-400 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
@@ -156,7 +156,7 @@
         </div>
         
         <div class="mt-4 pt-4 border-t border-emerald-500/40 flex justify-between items-center text-sm">
-          <span class="text-xs text-emerald-100">250 FCFA / quiz</span>
+          <span class="text-xs text-emerald-100">250 FCFA / bonne réponse (⚠️ -250 F si faux)</span>
           <button onclick="openWithdrawModal()" class="bg-white text-emerald-700 font-bold px-4 py-1.5 rounded-lg text-xs hover:bg-emerald-50 transition shadow-sm">
             Retirer (MoMo)
           </button>
@@ -180,11 +180,11 @@
         <div id="leaderboardList" class="space-y-2 text-xs"></div>
       </div>
 
-      <!-- Liste des 20 Quiz -->
+      <!-- Liste des 10 Quiz du Jour -->
       <div>
         <div class="flex justify-between items-center mb-3">
-          <h3 class="font-bold text-lg text-slate-700">Les 20 quiz du jour</h3>
-          <span class="text-xs bg-slate-200 text-slate-600 px-2 py-1 rounded">250 F / quiz</span>
+          <h3 class="font-bold text-lg text-slate-700">Les 10 quiz du jour (Difficile)</h3>
+          <span id="dateBadge" class="text-[10px] bg-slate-200 text-slate-600 px-2 py-1 rounded font-semibold"></span>
         </div>
         <div id="tasksContainer" class="space-y-4"></div>
       </div>
@@ -246,11 +246,10 @@
       const now = audioCtx.currentTime;
 
       if (type === 'success') {
-        // Jingle mélodieux de réussite (deux notes montantes)
         oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(523.25, now); // Do (C5)
-        oscillator.frequency.setValueAtTime(659.25, now + 0.1); // Mi (E5)
-        oscillator.frequency.setValueAtTime(783.99, now + 0.2); // Sol (G5)
+        oscillator.frequency.setValueAtTime(523.25, now);
+        oscillator.frequency.setValueAtTime(659.25, now + 0.1);
+        oscillator.frequency.setValueAtTime(783.99, now + 0.2);
         
         gainNode.gain.setValueAtTime(0.15, now);
         gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
@@ -258,7 +257,6 @@
         oscillator.start(now);
         oscillator.stop(now + 0.4);
       } else if (type === 'error') {
-        // Son grave d'échec / pénalité
         oscillator.type = 'sawtooth';
         oscillator.frequency.setValueAtTime(180, now);
         oscillator.frequency.setValueAtTime(120, now + 0.15);
@@ -292,28 +290,46 @@
     const SEBPAY_URL = "https://new.sebpay.bj/pay/cashquiz-EOCZs2";
     const TELEGRAM_CHANNEL = "https://t.me/+IOETEIV5ddg0ZTM0";
 
-    const dailyTasks = [
-      { id: 1, category: "Culture Générale", question: "Quel est le plus grand pays d'Afrique en superficie ?", options: ["RDC", "Algérie", "Soudan", "Libye"], answer: "Algérie" },
-      { id: 2, category: "Actualité & Institutions", question: "Quel organisme régional regroupe les pays ayant en commun l'usage du Franc CFA en Afrique de l'Ouest ?", options: ["CEMAC", "UEMOA", "CEDEAO", "UA"], answer: "UEMOA" },
-      { id: 3, category: "Culture Générale", question: "Sur quel fleuve se trouve le barrage d'Aswan (Assouan) ?", options: ["Le Niger", "Le Congo", "Le Nil", "Le Zambèze"], answer: "Le Nil" },
-      { id: 4, category: "Culture Générale", question: "Quel pays d'Afrique est le plus peuplé ?", options: ["L'Égypte", "L'Éthiopie", "Le Nigéria", "L'Afrique du Sud"], answer: "Le Nigéria" },
-      { id: 5, category: "Culture Générale", question: "En quelle année l'Afrique du Sud a-t-elle officiellement mis fin à l'apartheid avec l'élection de Nelson Mandela ?", options: ["1990", "1994", "1998", "2000"], answer: "1994" },
-      { id: 6, category: "Actualité & Économie", question: "Quelle cryptomonnaie ou actif virtuel a été l'un des premiers à intégrer des contrats intelligents sur une grande échelle ?", options: ["Bitcoin", "Ethereum", "Dogecoin", "Litecoin"], answer: "Ethereum" },
-      { id: 7, category: "Culture Générale", question: "Quelle est la capitale politique du Nigéria ?", options: ["Lagos", "Abuja", "Kano", "Ibadan"], answer: "Abuja" },
-      { id: 8, category: "Culture Générale", question: "Quel désert, l'un des plus grands au monde, couvre une grande partie du nord de l'Afrique ?", options: ["Le Kalahari", "Le Namib", "Le Sahara", "Le Danakil"], answer: "Le Sahara" },
-      { id: 9, category: "Actualité & Technologie", question: "Quel protocole ou application décentralisée est couramment utilisé pour les communications professionnelles et personnelles en Afrique ?", options: ["WhatsApp", "Telegram", "Signal", "Tous les trois"], answer: "Tous les trois" },
-      { id: 10, category: "Culture Générale", question: "Quel empire historique africain était célèbre pour sa richesse en or sous le règne de Kanga Moussa ?", options: ["L'Empire du Ghana", "L'Empire du Mali", "L'Empire songhaï", "Le Royaume du Congo"], answer: "L'Empire du Mali" },
-      { id: 11, category: "Culture Générale", question: "Quel est l'océan qui borde les côtes orientales de l'Afrique ?", options: ["L'Océan Atlantique", "L'Océan Indien", "L'Océan Arctique", "L'Océan Pacifique"], answer: "L'Océan Indien" },
-      { id: 12, category: "Actualité & Institutions", question: "Quel est le siège officiel de l'Union Africaine (UA) ?", options: ["Addis-Abeba (Éthiopie)", "Nairobi (Kenya)", "Abuja (Nigéria)", "Dakar (Sénégal)"], answer: "Addis-Abeba (Éthiopie)" },
-      { id: 13, category: "Culture Générale", question: "Quelle île immense se trouve au large de la côte sud-est de l'Afrique dans l'océan Indien ?", options: ["Maurice", "Les Comores", "Madagascar", "Les Seychelles"], answer: "Madagascar" },
-      { id: 14, category: "Culture Générale", question: "Quel physicien a formulé la célèbre théorie de la relativité (E=mc²) ?", options: ["Isaac Newton", "Albert Einstein", "Galilée", "Nikola Tesla"], answer: "Albert Einstein" },
-      { id: 15, category: "Actualité & Numérique", question: "Quel sigle désigne les services de paiement mobile par téléphone (comme MTN MoMo, Orange Money, etc.) ?", options: ["FinTech", "EdTech", "AgriTech", "DeepTech"], answer: "FinTech" },
-      { id: 16, category: "Culture Générale", question: "Quel est le plus long fleuve du monde ?", options: ["Le fleuve Congo", "Le Nil", "Le Niger", "Le Zambèze"], answer: "Le Nil" },
-      { id: 17, category: "Culture Générale", question: "Quel pays africain a pour capitale Lomé ?", options: ["Le Bénin", "Le Togo", "Le Ghana", "La Côte d'Ivoire"], answer: "Le Togo" },
-      { id: 18, category: "Actualité & Économie", question: "Que signifie le sigle 'ZLECAf' en économie africaine ?", options: ["Zone de Libre-Échange Continentale Africaine", "Zone Légale et Économique Centrale d'Afrique", "Banque Centrale d'Afrique", "Fonds Monétaire Africain"], answer: "Zone de Libre-Échange Continentale Africaine" },
-      { id: 19, category: "Culture Générale", question: "Quel explorateur européen a atteint les Indes en contournant l'Afrique par le Cap de Bonne-Espérance en 1497 ?", options: ["Christophe Colomb", "Vasco de Gama", "Magellan", "Marco Polo"], answer: "Vasco de Gama" },
-      { id: 20, category: "Culture Générale", question: "Combien y a-t-il de pays membres permanents disposant d'un droit de veto au Conseil de sécurité de l'ONU ?", options: ["3", "5", "10", "15"], answer: "5" }
+    // --- BANQUE DE QUESTIONS EXPERTES (Sélection stricte de 10 par jour) ---
+    const masterQuestionBank = [
+      { id: 1, category: "Géopolitique Africaine", question: "Quel accord de libre-échange continental (ZLECAf) a été officiellement lancé sous l'égide de quelle institution en 2018 ? (Ville du siège)", options: ["Addis-Abeba (UA)", "Abuja (CEDEAO)", "Dakar (BCEAO)", "Nairobi (COMESA)"], answer: "Addis-Abeba (UA)" },
+      { id: 2, category: "Macro-Économie", question: "Quel taux directeur la BCEAO a-t-elle principalement utilisé pour réguler l'inflation dans l'espace UEMOA ?", options: ["3,25 %", "2,50 %", "4,50 %", "5,00 %"], answer: "3,25 %" },
+      { id: 3, category: "Histoire & Souveraineté", question: "En quelle année exacte fut ratifiée la convention de création de l'Organisation de l'Unité Africaine (OUA) ?", options: ["1960", "1963", "1969", "1975"], answer: "1963" },
+      { id: 4, category: "Géographie Avancée", question: "Quel est le point culminant du grand rift africain situé en Tanzanie ?", options: ["Mont Kenya", "Mont Kilimandjaro (Kibo)", "Mont Elgon", "Mont Stanley"], answer: "Mont Kilimandjaro (Kibo)" },
+      { id: 5, category: "Droit & Institutions", question: "Quel traité harmonise le droit des affaires en Afrique à travers l'espace OHADA ?", options: ["Traité de Port-Louis", "Traité de Lagos", "Traité de Dakar", "Traité de Libreville"], answer: "Traité de Port-Louis" },
+      { id: 6, category: "Énergie & Technologie", question: "Quel pays africain détient les plus grandes réserves prouvées de platine et de manganèse au monde ?", options: ["Le Ghana", "L'Afrique du Sud", "La RDC", "Le Gabon"], answer: "L'Afrique du Sud" },
+      { id: 7, category: "Sciences & Numérique", question: "Quel protocole cryptographique sous-tend la scalabilité des réseaux de couche 2 sur Ethereum ?", options: ["Proof of Work", "Zero-Knowledge Rollups", "Proof of Burn", "Delegated Proof of Stake"], answer: "Zero-Knowledge Rollups" },
+      { id: 8, category: "Économie Monétaire", question: "Quelle est la parité fixe historique initiale entre l'Euro et le Franc CFA instaurée dès 1999 ?", options: ["1 EUR = 600 FCFA", "1 EUR = 655,957 FCFA", "1 EUR = 500 FCFA", "1 EUR = 700 FCFA"], answer: "1 EUR = 655,957 FCFA" },
+      { id: 9, category: "Géopolitique Mondiale", question: "Combien de membres non permanents composent le Conseil de sécurité des Nations unies ?", options: ["5", "10", "15", "7"], answer: "10" },
+      { id: 10, category: "Histoire Ancienne", question: "Sous quel règne l'empire du Mali a-t-il atteint son apogée territorial et culturel au XIVe siècle ?", options: ["Soundiata Keïta", "Kanga Moussa (Mansa Moussa)", "Soumaoro Kanté", "Askia Mohammed"], answer: "Kanga Moussa (Mansa Moussa)" },
+      { id: 11, category: "Démographie & Sociologie", question: "Selon l'ONU, quelle part de la population mondiale la jeunesse africaine représentera-t-elle en 2050 ?", options: ["10 %", "25 %", "40 %", "60 %"], answer: "25 %" },
+      { id: 12, category: "Institutions Financières", question: "Quelle institution internationale fait office de prêteur en dernier ressort pour la balance des paiements ?", options: ["La Banque Mondiale", "Le FMI (Fonds Monétaire International)", "La SFI", "La BAD"], answer: "Le FMI (Fonds Monétaire International)" }
     ];
+
+    // --- ROTATION EXACTE DE 10 QUESTIONS PAR JOUR ---
+    function getDailyTasks() {
+      const today = new Date();
+      const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+      
+      let shuffled = [...masterQuestionBank];
+      let m = shuffled.length, t, i;
+      let currentSeed = seed;
+      while (m) {
+        currentSeed = (currentSeed * 9301 + 49297) % 233280;
+        i = Math.floor((currentSeed / 233280) * m--);
+        t = shuffled[m];
+        shuffled[m] = shuffled[i];
+        shuffled[i] = t;
+      }
+
+      // Exactement 10 questions par jour
+      return shuffled.slice(0, 10).map((q, index) => ({
+        ...q,
+        id: index + 1
+      }));
+    }
+
+    let dailyTasks = getDailyTasks();
 
     const recentWithdrawals = [
       { name: "Serge K.", country: "Côte d'Ivoire", amount: "10 000 FCFA", operator: "MTN MoMo", time: "Il y a 2 minutes" },
@@ -330,7 +346,7 @@
     ];
 
     let allUsers = JSON.parse(localStorage.getItem('cashquiz_all_users')) || [
-      { id: "usr_1", name: "Jean Kouassi", email: "jean@gmail.com", country: "Côte d'Ivoire (+225)", phone: "0197000000", time: "12/11/2026 à 14:30", isPaid: true, balance: 3500, completedTasks: [1, 2, 3], referrals: 2, lastStreakDate: "" }
+      { id: "usr_1", name: "Jean Kouassi", email: "jean@gmail.com", country: "Côte d'Ivoire (+225)", phone: "0197000000", time: "12/11/2026 à 14:30", isPaid: true, balance: 3500, completedTasks: [], referrals: 2, lastStreakDate: "" }
     ];
 
     let currentUser = JSON.parse(localStorage.getItem('cashquiz_current_user')) || null;
@@ -490,9 +506,13 @@
       document.getElementById('userNameDisplay').textContent = currentUser.name;
       document.getElementById('balanceDisplay').textContent = currentUser.balance.toLocaleString('fr-FR');
       document.getElementById('tasksDoneCount').textContent = doneCount;
-      document.getElementById('todayEarnings').textContent = earnedToday.toLocaleString('fr-FR');
+      document.getElementById('totalTasksCount').textContent = dailyTasks.length;
+      document.getElementById('todayEarnings').textContent = earnedToday.toLocaleString('fr-FR') + " F";
       document.getElementById('progressBar').style.width = `${progressPercent}%`;
       document.getElementById('referralCount').textContent = currentUser.referrals || 0;
+      
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('dateBadge').textContent = new Date().toLocaleDateString('fr-FR', options);
 
       const activationBanner = document.getElementById('activationBanner');
       if (!currentUser.isPaid) {
@@ -521,14 +541,14 @@
 
         card.innerHTML = `
           <div class="flex justify-between items-center mb-2">
-            <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">${task.category}</span>
-            <span class="text-xs font-bold text-amber-600">+250 FCFA</span>
+            <span class="text-xs font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">${task.category}</span>
+            <span class="text-xs font-bold text-amber-600">+250 FCFA (⚠️ -250 F si faux)</span>
           </div>
-          <p class="font-medium text-sm mb-3">${task.question}</p>
+          <p class="font-medium text-sm mb-3 text-slate-800">${task.question}</p>
           <div class="space-y-2 mb-3">${optionsHtml}</div>
           ${isDone 
-            ? `<button disabled class="w-full bg-slate-200 text-slate-500 text-xs font-bold py-2 rounded-lg">Validée (+250 FCFA)</button>`
-            : `<button onclick="submitTask(${task.id})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-lg transition">Valider (+250 FCFA)</button>`
+            ? `<button disabled class="w-full bg-slate-200 text-slate-500 text-xs font-bold py-2 rounded-lg">Question validée (+250 FCFA)</button>`
+            : `<button onclick="submitTask(${task.id})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-lg transition">Valider la réponse</button>`
           }
         `;
         container.appendChild(card);
@@ -560,9 +580,8 @@
 
       const task = dailyTasks.find(t => t.id === taskId);
       
-      // Vérification de la réponse
       if (task.answer && selected.value !== task.answer) {
-        playSound('error'); // 🔊 Joue le son d'échec / pénalité
+        playSound('error');
         currentUser.balance = Math.max(0, currentUser.balance - TASK_REWARD);
         syncUserSave();
         updateDashboard();
@@ -570,7 +589,7 @@
         return;
       }
 
-      playSound('success'); // 🔊 Joue le jingle de réussite
+      playSound('success');
       currentUser.completedTasks.push(taskId);
       currentUser.balance += TASK_REWARD;
       syncUserSave();
